@@ -1,0 +1,20 @@
+Options -Indexes +FollowSymLinks
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Forzar HTTPS. Descomentar en producción (detrás de un dominio con TLS).
+    # RewriteCond %{HTTPS} off
+    # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # Instalación en subdirectorio: descomentar SOLO si la app no vive en la
+    # raíz del dominio (p. ej. https://midominio.com/tasks/).
+    # RewriteCond %{REQUEST_URI}::$1 ^(/.+)/(.*)::\2$
+    # RewriteRule ^(.*) - [E=BASE:%1]
+
+    # Front controller: si la URL no es un archivo o directorio real,
+    # todo se reescribe hacia index.php (así funciona el router de Slim).
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>

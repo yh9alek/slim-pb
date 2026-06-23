@@ -1,0 +1,35 @@
+# Ejemplo de VirtualHost para el despliegue idiomático.
+# La clave es que DocumentRoot apunta a public/, NUNCA a la raíz del proyecto:
+# así vendor/, config/ y .env quedan físicamente fuera del alcance del servidor.
+
+<VirtualHost *:80>
+    ServerName tasks.local
+
+    DocumentRoot /var/www/slim-flow/public
+
+    <Directory /var/www/slim-flow/public>
+        # AllowOverride All hace que el .htaccess de public/ tenga efecto.
+        AllowOverride All
+        Require all granted
+        Options -Indexes +FollowSymLinks
+    </Directory>
+
+    ErrorLog  ${APACHE_LOG_DIR}/slim-flow-error.log
+    CustomLog ${APACHE_LOG_DIR}/slim-flow-access.log combined
+</VirtualHost>
+
+
+# --- Variante recomendada en producción (mejor rendimiento) ---
+# Mueve las reglas del .htaccess aquí y desactiva AllowOverride para que Apache
+# no tenga que releer el .htaccess en cada petición:
+#
+#     <Directory /var/www/slim-flow/public>
+#         AllowOverride None
+#         Require all granted
+#         Options -Indexes +FollowSymLinks
+#
+#         RewriteEngine On
+#         RewriteCond %{REQUEST_FILENAME} !-d
+#         RewriteCond %{REQUEST_FILENAME} !-f
+#         RewriteRule ^ index.php [QSA,L]
+#     </Directory>
