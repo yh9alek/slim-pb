@@ -24,7 +24,7 @@ final readonly class PdoTaskRepository implements TaskRepository
     {
         $stmt = $this->pdo->query('SELECT id, title, completed FROM tasks ORDER BY id;');
 
-        if($stmt === false) {
+        if ($stmt === false) {
             return [];
         }
 

@@ -12,7 +12,7 @@ return function (App $app, HttpErrorHandler $errorHandler): void {
     $container = $app->getContainer();
     $settings = null;
 
-    if($container !== null) {
+    if ($container !== null) {
         $settings = $container->get(SettingsInterface::class);
 
         $app->add(JsonBodyParserMiddleware::class);
