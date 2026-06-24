@@ -22,7 +22,8 @@ final readonly class ShutdownHandler
         private Request $request,
         private HttpErrorHandler $errorHandler,
         private bool $displayErrorDetails,
-    ) {}
+    ) {
+    }
 
     public function __invoke(): void
     {

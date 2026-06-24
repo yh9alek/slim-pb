@@ -8,7 +8,10 @@ use PhpCsFixer\Finder;
 return (new Config())
     ->setRiskyAllowed(false)
     ->setRules([
-        '@auto' => true
+        '@PSR12' => true,
+        'method_argument_space' => [
+            'keep_multiple_spaces_after_comma' => true,
+        ],
     ])
     // 💡 by default, Fixer looks for `*.php` files excluding `./vendor/` - here, you can groom this config
     ->setFinder(

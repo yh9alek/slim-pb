@@ -15,7 +15,8 @@ final readonly class PdoTaskRepository implements TaskRepository
 {
     public function __construct(
         private readonly PDO $pdo
-    ) {}
+    ) {
+    }
 
     /**
      * returns Task[]
@@ -53,7 +54,7 @@ final readonly class PdoTaskRepository implements TaskRepository
             'INSERT INTO tasks (title, completed) VALUES (:title, :completed);',
         );
 
-        $stmt->bindValue(':title', $task->title, PDO::PARAM_STR);
+        $stmt->bindValue(':title',     $task->title,     PDO::PARAM_STR);
         $stmt->bindValue(':completed', $task->completed, PDO::PARAM_BOOL);
         $stmt->execute();
 
@@ -66,14 +67,13 @@ final readonly class PdoTaskRepository implements TaskRepository
 
     public function update(Task $task): Task
     {
-
         $stmt = $this->pdo->prepare(
             'UPDATE tasks SET title = :title, completed = :completed WHERE id = :id;'
         );
 
-        $stmt->bindValue(':title', $task->title, PDO::PARAM_STR);
+        $stmt->bindValue(':title',     $task->title,     PDO::PARAM_STR);
         $stmt->bindValue(':completed', $task->completed, PDO::PARAM_BOOL);
-        $stmt->bindValue(':id', $task->id, PDO::PARAM_INT);
+        $stmt->bindValue(':id',        $task->id,        PDO::PARAM_INT);
 
         $stmt->execute();
 
@@ -82,7 +82,6 @@ final readonly class PdoTaskRepository implements TaskRepository
 
     public function delete(int $id): void
     {
-
         $stmt = $this->pdo->prepare('DELETE FROM tasks WHERE id = :id;');
 
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);

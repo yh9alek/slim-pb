@@ -13,7 +13,8 @@ final readonly class Task implements JsonSerializable
         public ?int $id,
         public string $title,
         public bool $completed = false,
-    ) {}
+    ) {
+    }
 
     public function markCompleted(): self
     {
