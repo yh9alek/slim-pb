@@ -2,8 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Application\DTO\CreateTaskInput;
-use App\Application\DTO\UpdateTaskInput;
+use App\Application\DTO\TaskInput;
 use App\Application\Service\TaskService;
 use App\Domain\Task\Exception\TaskNotFoundException;
 use App\Domain\Task\Exception\TaskValidationException;
@@ -16,7 +15,7 @@ beforeEach(function (): void {
 });
 
 it('crea una tarea y le asigna un id', function (): void {
-    $task = $this->service->create(new CreateTaskInput('Comprar pan'));
+    $task = $this->service->create(new TaskInput('Comprar pan'));
 
     expect($task->id)->toBe(1)
         ->and($task->title)->toBe('Comprar pan')
@@ -24,16 +23,16 @@ it('crea una tarea y le asigna un id', function (): void {
 });
 
 it('lista las tareas creadas', function (): void {
-    $this->service->create(new CreateTaskInput('Tarea 1'));
-    $this->service->create(new CreateTaskInput('Tarea 2'));
+    $this->service->create(new TaskInput('Tarea 1'));
+    $this->service->create(new TaskInput('Tarea 2'));
 
     expect($this->service->list())->toHaveCount(2);
 });
 
 it('actualiza una tarea existente', function (): void {
-    $created = $this->service->create(new CreateTaskInput('Borrador'));
+    $created = $this->service->create(new TaskInput('Borrador'));
 
-    $updated = $this->service->update($created->id, new UpdateTaskInput('Final', completed: true));
+    $updated = $this->service->update($created->id, new TaskInput('Final', completed: true));
 
     expect($updated->title)->toBe('Final')
         ->and($updated->completed)->toBeTrue();
@@ -44,5 +43,5 @@ it('lanza una excepción al buscar una tarea inexistente', function (): void {
 })->throws(TaskNotFoundException::class);
 
 it('rechaza un título vacío al construir el DTO', function (): void {
-    CreateTaskInput::fromArray(['title' => '   ']);
+    TaskInput::validate(['title' => '   ']);
 })->throws(TaskValidationException::class);

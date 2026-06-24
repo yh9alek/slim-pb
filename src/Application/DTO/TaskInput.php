@@ -10,7 +10,7 @@ final class TaskInput
 {
     public function __construct(
         public string $title,
-        public bool $completed,
+        public bool $completed = false,
     ) {}
 
     /**
@@ -19,7 +19,7 @@ final class TaskInput
      */
     public static function validate(array $data): self
     {
-        $title = $data['title'] ?? '';
+        $title = (string) ($data['title'] ?? '');
 
         if (trim($title) === '') {
             throw new TaskValidationException('El título es obligatorio.');
