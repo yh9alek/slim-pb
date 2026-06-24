@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Action;
 
-use App\Application\DTO\CreateTaskInput;
+use App\Application\DTO\TaskInput;
 use App\Application\Service\TaskService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -16,12 +16,12 @@ final class CreateTaskAction extends Action
 {
     public function __construct(
         private readonly TaskService $service
-    ) { }
+    ) {}
 
     #[Override]
     public function __invoke(Request $request, Response $response, array $args): Response
     {
-        $input = CreateTaskInput::validate(
+        $input = TaskInput::validate(
             (array) $request->getParsedBody()
         );
 

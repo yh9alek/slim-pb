@@ -10,16 +10,20 @@ use Slim\App;
 
 return function (App $app, HttpErrorHandler $errorHandler): void {
     $container = $app->getContainer();
-    $settings = $container->get(SettingsInterface::class);
+    $settings = null;
 
-    $app->add(JsonBodyParserMiddleware::class);
-    $app->addRoutingMiddleware();
+    if($container !== null) {
+        $settings = $container->get(SettingsInterface::class);
 
-    $errorMiddleware = $app->addErrorMiddleware(
-        (bool) $settings->get('displayErrorDetails'),
-        true,
-        true,
-        $container->get(LoggerInterface::class),
-    );
-    $errorMiddleware->setDefaultErrorHandler($errorHandler);
+        $app->add(JsonBodyParserMiddleware::class);
+        $app->addRoutingMiddleware();
+
+        $errorMiddleware = $app->addErrorMiddleware(
+            (bool) $settings->get('displayErrorDetails'),
+            true,
+            true,
+            $container->get(LoggerInterface::class),
+        );
+        $errorMiddleware->setDefaultErrorHandler($errorHandler);
+    }
 };

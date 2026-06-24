@@ -8,6 +8,12 @@
 **/log/*
 **/cache/*
 
+# Cache de herramientas de calidad
+/.php-cs-fixer.cache
+/.phpunit.cache
+/.phpunit.result.cache
+/.pest
+
 !/logs/README.md
 .phpunit.result.cache
 

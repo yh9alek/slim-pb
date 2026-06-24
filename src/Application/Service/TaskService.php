@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Service;
 
-use App\Application\DTO\CreateTaskInput;
-use App\Application\DTO\UpdateTaskInput;
+use App\Application\DTO\TaskInput;
 use App\Domain\Task\Task;
 use App\Domain\Task\TaskRepository;
 use Psr\Log\LoggerInterface;
@@ -18,7 +17,7 @@ final readonly class TaskService
     public function __construct(
         private readonly TaskRepository $tasks,
         private readonly LoggerInterface $logger,
-    ) { }
+    ) {}
 
     /**
      * @return Task[]
@@ -33,16 +32,20 @@ final readonly class TaskService
         return $this->tasks->findById($id);
     }
 
-    public function create(CreateTaskInput $input): Task
+    public function create(TaskInput $input): Task
     {
-        $saved = $this->tasks->save(new Task(id: null, title: $input->title));
+        $saved = $this->tasks->save(new Task(
+            id: null,
+            title: $input->title
+        ));
 
         $this->logger->info('Tarea creada', ['id' => $saved->id]);
 
         return $saved;
     }
 
-    public function update(int $id, UpdateTaskInput $input): Task {
+    public function update(int $id, TaskInput $input): Task
+    {
 
         $existing = $this->tasks->findById($id);
 
@@ -59,7 +62,8 @@ final readonly class TaskService
         return $updated;
     }
 
-    public function delete(int $id): void {
+    public function delete(int $id): void
+    {
         $this->tasks->findById($id);
         $this->tasks->delete($id);
 

@@ -6,17 +6,22 @@ namespace App\Application\DTO;
 
 use App\Domain\Task\Exception\TaskValidationException;
 
-final class UpdateTaskInput {
-
+final class TaskInput
+{
     public function __construct(
         public string $title,
         public bool $completed,
-    ) { }
+    ) {}
 
-    public static function validate(array $data): self {
+    /**
+     * @param array<string, mixed> $data
+     * @throws TaskValidationException
+     */
+    public static function validate(array $data): self
+    {
         $title = $data['title'] ?? '';
 
-        if(trim($title) === '') {
+        if (trim($title) === '') {
             throw new TaskValidationException('El título es obligatorio.');
         }
 

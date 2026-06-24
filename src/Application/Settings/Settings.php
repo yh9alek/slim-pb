@@ -11,9 +11,7 @@ final readonly class Settings implements SettingsInterface
     /**
      * @param array<string, mixed> $settings
      */
-    public function __construct(private array $settings)
-    {
-    }
+    public function __construct(private array $settings) {}
 
     public function get(string $key): mixed
     {

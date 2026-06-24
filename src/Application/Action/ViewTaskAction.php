@@ -13,7 +13,7 @@ final class ViewTaskAction extends Action
 {
     public function __construct(
         private readonly TaskService $service
-    ) { }
+    ) {}
 
     #[Override]
     public function __invoke(Request $request, Response $response, array $args): Response
