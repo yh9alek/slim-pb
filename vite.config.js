@@ -44,14 +44,20 @@ export default defineConfig(({ command }) => ({
         port: 5173,
         strictPort: true,
         origin: 'http://localhost:5173',
-    },
+  },
 
-    build: {
-        manifest: true,
-        outDir: './build',
+  // Desactiva la "publicDir" de Vite: en un proyecto PHP, public/ es el
+  // document root, no la carpeta de estáticos de Vite. Evita el warning
+  // y el choque de nombres.
+  publicDir: false,
+
+  build: {
+    manifest: true,
+
+        // DENTRO de public: los assets quedan bajo el document root.
+        outDir: 'public/build',
         emptyOutDir: true,
         rollupOptions: {
-            // Una entrada por "área": 'app' es común a todo; el resto, por vista.
             input: {
                 app: 'resources/js/app.js',
                 tasks: 'resources/js/tasks.js',

@@ -18,7 +18,8 @@ return [
                 : __DIR__ . '/../var/cache/twig',
         ]);
 
-        // Integración con Vite: la función vite() en las plantillas.
+        // Vite compila a public/build, que cuelga del document root (public/),
+        // de modo que el navegador puede descargar los assets en /build/...
         $vite = new Vite(
             hotFile: __DIR__ . '/../public/hot',
             manifestPath: __DIR__ . '/../public/build/.vite/manifest.json',
