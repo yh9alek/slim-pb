@@ -22,6 +22,7 @@ $builder = new ContainerBuilder();
 $builder->addDefinitions(require __DIR__ . '/../config/settings.php');
 $builder->addDefinitions(require __DIR__ . '/../config/dependencies.php');
 $builder->addDefinitions(require __DIR__ . '/../config/repositories.php');
+$builder->addDefinitions(require __DIR__ . '/../config/views.php');
 
 if (($_ENV['APP_ENV'] ?? 'dev') === 'prod') {
     $builder->enableCompilation(__DIR__ . '/../var/cache');
@@ -49,9 +50,10 @@ $errorHandler = new HttpErrorHandler(
 #    Se registra ANTES de procesar para estar activo durante toda la petición.
 register_shutdown_function(new ShutdownHandler($request, $errorHandler, $displayErrorDetails));
 
-# 7. Pipeline de middleware y rutas
+# 7. Pipeline de middleware, rutas de API y rutas web (HTML)
 (require __DIR__ . '/../config/middleware.php')($app, $errorHandler);
-(require __DIR__ . '/../config/routes.php')($app);
+(require __DIR__ . '/../config/routes/api.php')($app);
+(require __DIR__ . '/../config/routes/web.php')($app);
 
 # 8. Procesar y emitir: ruta -> middleware -> acción -> respuesta
 $response = $app->handle($request);

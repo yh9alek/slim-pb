@@ -1,0 +1,24 @@
+{% extends 'layout.twig' %}
+
+{% block title %}
+    Tareas
+{% endblock %}
+
+{% block content %}
+    <h1>Tareas</h1>
+
+    {% if tasks is empty %}
+        <p>No hay tareas todavía.</p>
+    {% else %}
+        <ul>
+            {% for task in tasks %}
+                <li>
+                    #{{ task.id }} — {{ task.title }}
+                    {% if task.completed %}
+                        <strong>(completada)</strong>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}
