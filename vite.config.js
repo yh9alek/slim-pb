@@ -48,7 +48,7 @@ export default defineConfig(({ command }) => ({
 
     build: {
         manifest: true,
-        outDir: 'public/build',
+        outDir: './build',
         emptyOutDir: true,
         rollupOptions: {
             // Una entrada por "área": 'app' es común a todo; el resto, por vista.
