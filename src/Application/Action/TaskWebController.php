@@ -26,4 +26,9 @@ final class TaskWebController
             'tasks' => $this->service->list(),
         ]);
     }
+
+    public function others(Request $request, Response $response): Response
+    {
+        return $this->twig->render($response, 'others/index.twig');
+    }
 }

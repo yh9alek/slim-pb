@@ -8,5 +8,6 @@ use Slim\App;
 # Rutas que devuelven HTML (SSR con Twig), separadas de la API JSON.
 
 return function (App $app): void {
-    $app->get('/', [TaskWebController::class, 'index']);
+    $app->get('/tasks',  [TaskWebController::class, 'index']);
+    $app->get('/others', [TaskWebController::class, 'others']);
 };

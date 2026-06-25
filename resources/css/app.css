@@ -1,0 +1,117 @@
+:root {
+    color-scheme: light dark;
+    --bg: #ffffff;
+    --fg: #1a1a1a;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --card: #f9fafb;
+    --accent: #2563eb;
+    --danger: #dc2626;
+    font-family: system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #0f1115;
+        --fg: #e5e7eb;
+        --muted: #9ca3af;
+        --border: #2a2f3a;
+        --card: #171a21;
+    }
+}
+
+body {
+    margin-inline: auto;
+    max-width: 640px;
+    padding: 2rem;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.5;
+}
+
+h1 {
+    font-weight: 700;
+}
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-block: 1rem 1.5rem;
+}
+
+.toolbar__search {
+    flex: 1 1 12rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    background: var(--bg);
+    color: inherit;
+    font: inherit;
+}
+
+.toolbar__count {
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.tasks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+}
+
+.task {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 0.6rem;
+}
+
+.task--done .task__title {
+    text-decoration: line-through;
+    color: var(--muted);
+}
+
+.task__actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+button {
+    padding: 0.4rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 0.45rem;
+    background: var(--bg);
+    color: var(--accent);
+    font: inherit;
+    cursor: pointer;
+}
+
+button:hover {
+    border-color: var(--accent);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: progress;
+}
+
+button.danger {
+    color: var(--danger);
+}
+
+button.danger:hover {
+    border-color: var(--danger);
+}
+
+.empty {
+    color: var(--muted);
+}
