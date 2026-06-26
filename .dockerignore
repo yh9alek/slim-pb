@@ -1,0 +1,33 @@
+# Control de versiones
+.git
+.gitignore
+.github
+
+# Dependencias y artefactos generados
+vendor
+node_modules
+public/build
+public/hot
+
+# Cache y logs locales
+var/cache/*
+var/log/*
+
+# Secretos y entorno local (Dokploy inyecta las variables)
+.env
+.env.*
+!.env.example
+
+# Desarrollo / calidad
+tests
+coverage
+*.md
+.editorconfig
+.php-cs-fixer.dist.php
+.php-cs-fixer.cache
+phpstan.neon
+phpunit.xml.dist
+.phpunit.result.cache
+deploy.sh
+apache-vhost.conf.example
+docker-compose*.yml
