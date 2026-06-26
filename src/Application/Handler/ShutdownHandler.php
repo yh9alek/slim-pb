@@ -42,8 +42,8 @@ final readonly class ShutdownHandler
             $this->request,
             $exception,
             $this->displayErrorDetails,
-            false,
-            false,
+            true,  // logErrors: un fatal es un 500, y queremos verlo en el log
+            true,  // logErrorDetails: traza completa del fatal en el registro
         );
 
         (new ResponseEmitter())->emit($response);

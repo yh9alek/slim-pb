@@ -16,12 +16,8 @@ use Slim\Interfaces\CallableResolverInterface;
 use Slim\Views\Twig;
 use Throwable;
 
-// Convierte excepciones en respuestas coherentes y NEGOCIA el formato:
-//  - Navegación del navegador (Accept: text/html) -> vista HTML de error.
-//  - API / AJAX (Accept: application/json o */*)   -> JSON, como siempre.
 final class HttpErrorHandler extends ErrorHandler
 {
-    // Título y mensaje amigable por código (para las vistas HTML).
     private const array MESSAGES = [
         400 => ['Solicitud incorrecta', 'La petición no se pudo procesar.'],
         401 => ['No autenticado', 'Necesitas iniciar sesión para ver esta página.'],
@@ -34,6 +30,8 @@ final class HttpErrorHandler extends ErrorHandler
         503 => ['Servicio no disponible', 'Estamos en mantenimiento.'],
     ];
 
+    private const array LOGGABLE_STATUSES = [401, 403, 405, 419, 429, 500];
+
     public function __construct(
         CallableResolverInterface $callableResolver,
         ResponseFactoryInterface $responseFactory,
@@ -41,6 +39,15 @@ final class HttpErrorHandler extends ErrorHandler
         ?LoggerInterface $logger = null,
     ) {
         parent::__construct($callableResolver, $responseFactory, $logger);
+    }
+
+    protected function writeToErrorLog(): void
+    {
+        if (!in_array($this->resolveStatus(), self::LOGGABLE_STATUSES, true)) {
+            return;
+        }
+
+        parent::writeToErrorLog();
     }
 
     protected function respond(): Response

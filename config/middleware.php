@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Application\Handler\HttpErrorHandler;
 use App\Application\Middleware\JsonBodyParserMiddleware;
+use App\Application\Middleware\WellKnownProbeMiddleware;
 use App\Application\Settings\SettingsInterface;
 use Psr\Log\LoggerInterface;
 use Slim\App;
@@ -30,5 +31,9 @@ return function (App $app, HttpErrorHandler $errorHandler): void {
             $container->get(LoggerInterface::class),
         );
         $errorMiddleware->setDefaultErrorHandler($errorHandler);
+
+        // El más externo: descarta el ruido de DevTools (/.well-known/appspecific/*)
+        // antes del enrutado, para que no se registre como 404 en el log.
+        $app->add(new WellKnownProbeMiddleware($app->getResponseFactory()));
     }
 };
