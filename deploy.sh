@@ -16,8 +16,8 @@ echo "==> 2/7  Dependencias PHP (sin dev, autoloader optimizado)"
 composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
 echo "==> 3/7  Instalando dependencias de Node y compilando assets"
-npm ci
-npm run build
+bun ci
+bun run build
 
 echo "==> 4/7  Eliminando el hot file de desarrollo (si quedó de una sesión dev)"
 rm -f public/hot
