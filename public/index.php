@@ -11,6 +11,7 @@ use Psr\Log\LoggerInterface;
 use Slim\Factory\AppFactory;
 use Slim\Factory\ServerRequestCreatorFactory;
 use Slim\ResponseEmitter;
+use Slim\Views\Twig;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -43,17 +44,17 @@ $request = ServerRequestCreatorFactory::create()->createServerRequestFromGlobals
 $errorHandler = new HttpErrorHandler(
     $app->getCallableResolver(),
     $app->getResponseFactory(),
+    $container->get(Twig::class),
     $container->get(LoggerInterface::class),
 );
 
 # 6. Red de seguridad para errores fatales que escapan al ErrorMiddleware.
-#    Se registra ANTES de procesar para estar activo durante toda la petición.
 register_shutdown_function(new ShutdownHandler($request, $errorHandler, $displayErrorDetails));
 
 # 7. Pipeline de middleware, rutas de API y rutas web (HTML)
 (require __DIR__ . '/../config/middleware.php')($app, $errorHandler);
-(require __DIR__ . '/../config/routes/api.php')($app);
-(require __DIR__ . '/../config/routes/web.php')($app);
+(require __DIR__ . '/../routes/api.php')($app);
+(require __DIR__ . '/../routes/web.php')($app);
 
 # 8. Procesar y emitir: ruta -> middleware -> acción -> respuesta
 $response = $app->handle($request);

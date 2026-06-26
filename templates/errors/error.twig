@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> {{ status }} · {{ title }} </title>
+    <style>
+            /* Paleta de colores inspirada en Dokploy (Tailwind Zinc/Neutral) */
+            :root {
+                --bg: #ffffff;
+                --text-main: #09090b;
+                --text-muted: #71717a;
+                --btn-bg: #719E40;
+                --btn-text: #fafafa;
+                --btn-hover: #27272a;
+                --border: #e4e4e7;
+            }
+
+            /* Soporte nativo para Dark Mode */
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --bg: #09090b;
+                    --text-main: #fafafa;
+                    --text-muted: #a1a1aa;
+                    --btn-bg: #719E40;
+                    --btn-text: #18181b;
+                    --btn-hover: #e4e4e7;
+                    --border: #27272a;
+                }
+            }
+
+            body {
+                margin: 0;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                background-color: var(--bg);
+                color: var(--text-main);
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            .container {
+                text-align: center;
+                padding: 2rem;
+                max-width: 32rem;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            /* Contenedor del código para darle ese toque de "terminal/log" limpio */
+            .code-wrapper {
+                margin-bottom: 30px;
+            }
+
+            .code {
+                font-size: 6rem;
+                font-weight: 600;
+                /*font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;*/
+                line-height: 1;
+                margin: 0;
+                letter-spacing: -0.025em;
+            }
+
+            .title {
+                font-size: 2.5rem;
+                font-weight: 500;
+                margin: 0;
+                letter-spacing: -0.05em;
+                line-height: 1.2;
+            }
+
+            .message {
+                color: var(--text-muted);
+                font-size: 1.125rem;
+                line-height: 1.6;
+                margin: 1rem 0 2rem;
+                max-width: 28rem;
+            }
+
+            /* Estilo de botón moderno tipo Dokploy/Shadcn */
+            .home {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                padding: 0.625rem 1.25rem;
+                font-size: 0.875rem;
+                font-weight: 500;
+                color: var(--btn-text);
+                background-color: var(--btn-bg);
+                text-decoration: none;
+                border-radius: 6px;
+                transition: all 0.2s ease;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            }
+
+            .home svg {
+                width: 16px;
+                height: 16px;
+                transition: transform 0.2s ease;
+            }
+
+            .home:hover svg {
+                transform: translateX(-4px);
+            }
+        </style>
+</head>
+<body>
+    <div class="container">
+        <div class="code-wrapper">
+            <p class="code">{{ status }}</p>
+        </div>
+
+        <p class="title">{{ title }}</p>
+        <p class="message">{{ message }}</p>
+
+        <a class="home" href="/">
+            <!-- Icono SVG tipo "Lucide" muy usado en estas interfaces -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m12 19-7-7 7-7"/>
+                <path d="M19 12H5"/>
+            </svg>
+            Volver al inicio
+        </a>
+    </div>
+</body>
+</html>

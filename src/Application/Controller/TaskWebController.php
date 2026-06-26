@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Action;
+namespace App\Application\Controller;
 
 use App\Application\Service\TaskService;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -25,10 +25,5 @@ final class TaskWebController
         return $this->twig->render($response, 'tasks/index.twig', [
             'tasks' => $this->service->list(),
         ]);
-    }
-
-    public function others(Request $request, Response $response): Response
-    {
-        return $this->twig->render($response, 'others/index.twig');
     }
 }

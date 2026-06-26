@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Action;
+namespace App\Application\Shared;
 
 use Psr\Http\Message\ResponseInterface as Response;
 
 // Acción base: centraliza la serialización JSON para no repetirla.
-abstract class Action
+abstract class Api
 {
     protected function json(Response $response, mixed $data, int $status = 200): Response
     {

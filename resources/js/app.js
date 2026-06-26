@@ -1,3 +1,3 @@
 import '../css/app.css';
 
-console.log('Vite + Slim listo 🚀');
+console.log('Slim 4 🍃 + Vite 8 ⚡');

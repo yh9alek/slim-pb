@@ -2,14 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Action;
+namespace App\Application\Controller;
 
 use App\Application\DTO\TaskInput;
 use App\Application\Service\TaskService;
+use App\Application\Shared\Api;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
-final class TaskController extends Action
+final class TaskController extends Api
 {
     public function __construct(
         private readonly TaskService $service

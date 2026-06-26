@@ -61,7 +61,6 @@ export default defineConfig(({ command }) => ({
             input: {
                 app: 'resources/js/app.js',
                 tasks: 'resources/js/tasks.js',
-                others: 'resources/js/others.js',
             },
         },
     },
