@@ -147,6 +147,9 @@ final class HttpErrorHandler extends ErrorHandler
                         'status' => $status,
                         'title' => $title,
                         'message' => $message,
+                        'retryAfter' => $this->exception instanceof ThrottleException
+                            ? $this->exception->retryAfter
+                            : 0,
                     ]);
                 }
             }

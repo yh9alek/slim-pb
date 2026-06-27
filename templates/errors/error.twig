@@ -81,6 +81,16 @@
                 max-width: 28rem;
             }
 
+            /* La cuenta atrás reutiliza el estilo de mensaje, con el número resaltado */
+            .countdown {
+                margin-top: -1rem;
+            }
+
+            .countdown strong {
+                color: var(--text-main);
+                font-variant-numeric: tabular-nums;
+            }
+
             /* Estilo de botón moderno tipo Dokploy/Shadcn */
             .home {
                 display: inline-flex;
@@ -96,6 +106,12 @@
                 border-radius: 6px;
                 transition: all 0.2s ease;
                 box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            }
+
+            /* Botón inhabilitado mientras corre la cuenta atrás */
+            .home.is-disabled {
+                opacity: 0.5;
+                pointer-events: none;
             }
 
             .home svg {
@@ -119,7 +135,41 @@
         <p class="message">{{ message }}</p>
 
         {% if status == 429 %}
-            <a class="home" style="cursor: pointer;" onclick="window.location.reload();"> Reintentar </a>
+            {% set seconds = retryAfter|default(0) %}
+
+            <a class="home is-disabled message countdown" data-countdown="{{ seconds }}" data-retry style="cursor: pointer;">Reintentar en <span data-remaining>{{ seconds }}</span></a>
+
+            <script>
+                (function () {
+                    var wrapper = document.querySelector('[data-countdown]');
+                    var span = document.querySelector('[data-remaining]');
+                    var btn = document.querySelector('[data-retry]');
+                    var remaining = parseInt(wrapper.getAttribute('data-countdown'), 10) || 0;
+
+                    function enable() {
+                        wrapper.textContent = 'Reintentar';
+                        btn.classList.remove('is-disabled');
+                        btn.addEventListener('click', function () {
+                            window.location.reload();
+                        });
+                    }
+
+                    if (remaining <= 0) {
+                        enable();
+                        return;
+                    }
+
+                    var timer = setInterval(function () {
+                        remaining -= 1;
+                        if (remaining <= 0) {
+                            clearInterval(timer);
+                            enable();
+                        } else {
+                            span.textContent = remaining;
+                        }
+                    }, 1000);
+                })();
+            </script>
         {% else %}
             <a class="home" style="cursor: pointer;" onclick="window.history.back();">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
