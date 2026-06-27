@@ -19,5 +19,10 @@ return [
             'path' => __DIR__ . '/../var/log/app.log',
             'level' => Level::Debug,
         ],
+        // Throttling: nº de peticiones por ventana (segundos), por IP.
+        'throttle' => [
+            'limit' => (int) ($_ENV['THROTTLE_LIMIT'] ?? 30),
+            'window' => (int) ($_ENV['THROTTLE_WINDOW'] ?? 60),
+        ],
     ]),
 ];

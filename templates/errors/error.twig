@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> {{ status }} · {{ title }} </title>
     <style>
-            /* Paleta de colores inspirada en Dokploy (Tailwind Zinc/Neutral) */
             :root {
                 --bg: #ffffff;
                 --text-main: #09090b;
@@ -119,14 +118,17 @@
         <p class="title">{{ title }}</p>
         <p class="message">{{ message }}</p>
 
-        <a class="home" href="/">
-            <!-- Icono SVG tipo "Lucide" muy usado en estas interfaces -->
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="m12 19-7-7 7-7"/>
-                <path d="M19 12H5"/>
-            </svg>
-            Volver al inicio
-        </a>
+        {% if status == 429 %}
+            <a class="home" style="cursor: pointer;" onclick="window.location.reload();"> Reintentar </a>
+        {% else %}
+            <a class="home" style="cursor: pointer;" onclick="window.history.back();">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m12 19-7-7 7-7"/>
+                    <path d="M19 12H5"/>
+                </svg>
+                Volver
+            </a>
+        {% endif %}
     </div>
 </body>
 </html>

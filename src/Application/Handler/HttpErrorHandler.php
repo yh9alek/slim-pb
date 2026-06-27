@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Handler;
 
+use App\Application\Throttle\ThrottleException;
 use App\Domain\Shared\NotFoundException;
 use App\Domain\Shared\ValidationException;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -16,6 +17,9 @@ use Slim\Interfaces\CallableResolverInterface;
 use Slim\Views\Twig;
 use Throwable;
 
+// Convierte excepciones en respuestas HTTP:
+//  - Navegación del navegador (Accept: text/html) -> vista HTML de error.
+//  - API / AJAX (Accept: application/json o */*)   -> JSON, como siempre.
 final class HttpErrorHandler extends ErrorHandler
 {
     private const array MESSAGES = [
@@ -27,10 +31,8 @@ final class HttpErrorHandler extends ErrorHandler
         419 => ['La página expiró', 'Tu sesión ha caducado. Recarga e inténtalo de nuevo.'],
         429 => ['Demasiadas peticiones', 'Has hecho demasiadas solicitudes. Espera un momento.'],
         500 => ['Error interno', 'Algo salió mal por nuestra parte. Inténtalo más tarde.'],
-        503 => ['Servicio no disponible', 'Estamos en mantenimiento.'],
+        503 => ['Servicio no disponible', 'Estamos en mantenimiento. Vuelve en unos minutos.'],
     ];
-
-    private const array LOGGABLE_STATUSES = [401, 403, 405, 419, 429, 500];
 
     public function __construct(
         CallableResolverInterface $callableResolver,
@@ -43,11 +45,37 @@ final class HttpErrorHandler extends ErrorHandler
 
     protected function writeToErrorLog(): void
     {
-        if (!in_array($this->resolveStatus(), self::LOGGABLE_STATUSES, true)) {
+        if ($this->exception instanceof ThrottleException) {
             return;
         }
 
-        parent::writeToErrorLog();
+        $this->logError($this->summarize($this->exception));
+    }
+
+    private function summarize(Throwable $exception): string
+    {
+        $summary = sprintf(
+            "%s:\n%s\n(código %s) en %s:%d",
+            $exception::class,
+            $exception->getMessage(),
+            (string) $exception->getCode(),
+            $exception->getFile(),
+            $exception->getLine(),
+        );
+
+        // Incluimos la causa (sin traza) cuando hay una excepción previa.
+        $previous = $exception->getPrevious();
+        if ($previous !== null) {
+            $summary .= sprintf(
+                "\n | Causa: %s:\n%s en %s:%d",
+                $previous::class,
+                $previous->getMessage(),
+                $previous->getFile(),
+                $previous->getLine(),
+            );
+        }
+
+        return $summary;
     }
 
     protected function respond(): Response
@@ -73,8 +101,6 @@ final class HttpErrorHandler extends ErrorHandler
 
     private function wantsHtml(): bool
     {
-        // Una navegación tradicional del navegador incluye text/html en Accept;
-        // los clientes de API piden application/json (o */*).
         return str_contains($this->request->getHeaderLine('Accept'), 'text/html');
     }
 
@@ -88,7 +114,7 @@ final class HttpErrorHandler extends ErrorHandler
         $response = $this->responseFactory->createResponse($status);
         $response->getBody()->write($html);
 
-        return $this->withAllow($response)->withHeader('Content-Type', 'text/html; charset=utf-8');
+        return $this->withExtraHeaders($response)->withHeader('Content-Type', 'text/html; charset=utf-8');
     }
 
     private function jsonResponse(int $status): Response
@@ -107,11 +133,9 @@ final class HttpErrorHandler extends ErrorHandler
         $response = $this->responseFactory->createResponse($status);
         $response->getBody()->write(json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
 
-        return $this->withAllow($response)->withHeader('Content-Type', 'application/json');
+        return $this->withExtraHeaders($response)->withHeader('Content-Type', 'application/json');
     }
 
-    // Intenta una plantilla específica (errors/404.twig) y, si no existe, la
-    // genérica. Cualquier fallo de render cae al HTML mínimo de respaldo.
     private function renderTemplate(int $status, string $title, string $message): ?string
     {
         try {
@@ -133,8 +157,6 @@ final class HttpErrorHandler extends ErrorHandler
         return null;
     }
 
-    // HTML autocontenido: se usa si la plantilla falta o falla al renderizar,
-    // de modo que la página de error NUNCA depende del pipeline de assets.
     private function fallbackHtml(int $status, string $title, string $message): string
     {
         $title = htmlspecialchars($title, ENT_QUOTES);
@@ -153,13 +175,19 @@ final class HttpErrorHandler extends ErrorHandler
             HTML;
     }
 
-    // En un 405, la respuesta debe indicar los métodos permitidos.
-    private function withAllow(Response $response): Response
+    private function withExtraHeaders(Response $response): Response
     {
         $exception = $this->exception;
 
         if ($exception instanceof HttpMethodNotAllowedException) {
-            return $response->withHeader('Allow', implode(', ', $exception->getAllowedMethods()));
+            $response = $response->withHeader('Allow', implode(', ', $exception->getAllowedMethods()));
+        }
+
+        if ($exception instanceof ThrottleException) {
+            $response = $response
+                ->withHeader('Retry-After', (string) $exception->retryAfter)
+                ->withHeader('X-RateLimit-Limit', (string) $exception->limit)
+                ->withHeader('X-RateLimit-Remaining', '0');
         }
 
         return $response;

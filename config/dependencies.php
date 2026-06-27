@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Application\Middleware\ThrottleMiddleware;
 use App\Application\Settings\SettingsInterface;
+use App\Application\Throttle\FileRateLimiterStore;
+use App\Application\Throttle\RateLimiterStore;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -40,5 +43,21 @@ return [
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 
         return $pdo;
+    },
+
+    // Almacén de contadores del rate limiter.
+    RateLimiterStore::class => fn (): RateLimiterStore =>
+        new FileRateLimiterStore(__DIR__ . '/../var/cache/throttle'),
+
+    // Middleware de throttling configurado desde settings (límite global).
+    ThrottleMiddleware::class => function (ContainerInterface $c): ThrottleMiddleware {
+        $cfg = $c->get(SettingsInterface::class)->get('throttle');
+
+        return new ThrottleMiddleware(
+            $c->get(RateLimiterStore::class),
+            $c->get(LoggerInterface::class),
+            (int) $cfg['limit'],
+            (int) $cfg['window'],
+        );
     },
 ];
