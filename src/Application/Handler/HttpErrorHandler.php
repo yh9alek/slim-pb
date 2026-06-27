@@ -67,7 +67,7 @@ final class HttpErrorHandler extends ErrorHandler
         $previous = $exception->getPrevious();
         if ($previous !== null) {
             $summary .= sprintf(
-                "\n | Causa: %s:\n%s en %s:%d",
+                "\n\nCausa: %s:\n%s en %s:%d",
                 $previous::class,
                 $previous->getMessage(),
                 $previous->getFile(),
