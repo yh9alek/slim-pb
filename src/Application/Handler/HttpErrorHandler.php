@@ -112,15 +112,35 @@ final class HttpErrorHandler extends ErrorHandler
 
     private function htmlResponse(int $status): Response
     {
-        [$title, $message] = self::MESSAGES[$status] ?? ['Error', 'Ocurrió un error inesperado.'];
-
-        $html = $this->renderTemplate($status, $title, $message)
-            ?? $this->fallbackHtml($status, $title, $message);
+        // En desarrollo, un error de servidor (>= 500) se muestra con el
+        // depurador detallado. En producción (o para 4xx) -> plantilla genérica.
+        $html = ($status >= 500 && $this->displayErrorDetails)
+            ? ($this->renderDebug() ?? $this->genericHtml($status))
+            : $this->genericHtml($status);
 
         $response = $this->responseFactory->createResponse($status);
         $response->getBody()->write($html);
 
         return $this->withExtraHeaders($response)->withHeader('Content-Type', 'text/html; charset=utf-8');
+    }
+
+    private function renderDebug(): ?string
+    {
+        try {
+            // dirname(__DIR__, 3): desde src/Application/Handler -> raíz del proyecto.
+            return (new DebugErrorRenderer(\dirname(__DIR__, 3)))
+                ->render($this->exception, $this->request);
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
+    private function genericHtml(int $status): string
+    {
+        [$title, $message] = self::MESSAGES[$status] ?? ['Error', 'Ocurrió un error inesperado.'];
+
+        return $this->renderTemplate($status, $title, $message)
+            ?? $this->fallbackHtml($status, $title, $message);
     }
 
     private function jsonResponse(int $status): Response

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Handler;
 
+use ErrorException;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Exception\HttpInternalServerErrorException;
 use Slim\ResponseEmitter;
@@ -32,9 +33,21 @@ final readonly class ShutdownHandler
             return;
         }
 
+        // Excepción que lleva la UBICACIÓN REAL del fatal (archivo y línea que
+        // reporta PHP). Va como "previous" para que la página de depuración
+        // señale el lugar a corregir, no el punto donde se construye este 500.
+        $fatal = new ErrorException(
+            $error['message'],
+            0,
+            $error['type'],
+            $error['file'],
+            $error['line'],
+        );
+
         $exception = new HttpInternalServerErrorException(
             $this->request,
             $this->buildMessage($error),
+            $fatal,
         );
 
         $response = ($this->errorHandler)(
@@ -42,8 +55,14 @@ final readonly class ShutdownHandler
             $exception,
             $this->displayErrorDetails,
             true,  // logErrors: un fatal es un 500, y queremos verlo en el log
-            true,  // logErrorDetails: traza completa del fatal en el registro
+            true,  // logErrorDetails
         );
+
+        // Descartamos cualquier salida parcial (incluida la cruda de PHP) para
+        // que la página de error no quede precedida de texto desbordado.
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
 
         (new ResponseEmitter())->emit($response);
     }
