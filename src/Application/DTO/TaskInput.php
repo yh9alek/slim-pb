@@ -11,8 +11,7 @@ final class TaskInput
     public function __construct(
         public string $title,
         public bool $completed = false,
-    ) {
-    }
+    ) {}
 
     /**
      * @param array<string, mixed> $data

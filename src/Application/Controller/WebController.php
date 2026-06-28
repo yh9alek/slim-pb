@@ -11,9 +11,8 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 final class WebController
 {
     public function __construct(
-        private readonly Twig $twig
-    ){
-    }
+        private readonly Twig $twig,
+    ) {}
 
     public function home(Request $request, Response $response): Response
     {

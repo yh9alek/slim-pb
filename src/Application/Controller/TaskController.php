@@ -13,9 +13,8 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 final class TaskController extends Api
 {
     public function __construct(
-        private readonly TaskService $service
-    ) {
-    }
+        private readonly TaskService $service,
+    ) {}
 
     public function index(Request $request, Response $response): Response
     {
@@ -37,7 +36,7 @@ final class TaskController extends Api
     public function store(Request $request, Response $response): Response
     {
         $input = TaskInput::validate(
-            (array) $request->getParsedBody()
+            (array) $request->getParsedBody(),
         );
 
         return $this->json($response, [
@@ -54,7 +53,7 @@ final class TaskController extends Api
         $this->service->find((int) $args['id']);
 
         $input = TaskInput::validate(
-            (array) $request->getParsedBody()
+            (array) $request->getParsedBody(),
         );
 
         $updated = $this->service->update(
@@ -74,7 +73,7 @@ final class TaskController extends Api
     public function destroy(Request $request, Response $response, array $args): Response
     {
         $this->service->delete(
-            (int) $args['id']
+            (int) $args['id'],
         );
 
         return $this->noContent($response);

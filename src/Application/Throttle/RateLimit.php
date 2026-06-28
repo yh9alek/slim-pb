@@ -10,6 +10,5 @@ final readonly class RateLimit
     public function __construct(
         public int $hits,        // peticiones acumuladas en la ventana actual
         public int $retryAfter,  // segundos que faltan para que la ventana expire
-    ) {
-    }
+    ) {}
 }

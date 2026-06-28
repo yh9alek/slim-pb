@@ -10,9 +10,7 @@ use Twig\TwigFunction;
 // Expone la función vite('resources/js/app.js') a las plantillas.
 final class ViteExtension extends AbstractExtension
 {
-    public function __construct(private readonly Vite $vite)
-    {
-    }
+    public function __construct(private readonly Vite $vite) {}
 
     /**
      * @return TwigFunction[]

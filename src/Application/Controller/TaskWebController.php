@@ -17,8 +17,7 @@ final class TaskWebController
     public function __construct(
         private readonly TaskService $service,
         private readonly Twig $twig,
-    ) {
-    }
+    ) {}
 
     public function index(Request $request, Response $response): Response
     {

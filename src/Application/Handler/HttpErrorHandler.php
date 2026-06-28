@@ -34,6 +34,8 @@ final class HttpErrorHandler extends ErrorHandler
         503 => ['Servicio no disponible', 'Estamos en mantenimiento. Vuelve en unos minutos.'],
     ];
 
+    private const array LOGGABLE_STATUSES = [401, 403, 405, 419, 429, 500];
+
     public function __construct(
         CallableResolverInterface $callableResolver,
         ResponseFactoryInterface $responseFactory,
@@ -46,6 +48,10 @@ final class HttpErrorHandler extends ErrorHandler
     protected function writeToErrorLog(): void
     {
         if ($this->exception instanceof ThrottleException) {
+            return;
+        }
+
+        if (!in_array($this->resolveStatus(), self::LOGGABLE_STATUSES, true)) {
             return;
         }
 

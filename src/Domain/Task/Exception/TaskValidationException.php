@@ -6,6 +6,4 @@ namespace App\Domain\Task\Exception;
 
 use App\Domain\Shared\ValidationException;
 
-final class TaskValidationException extends ValidationException
-{
-}
+final class TaskValidationException extends ValidationException {}

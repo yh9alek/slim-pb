@@ -4,6 +4,4 @@ declare(strict_types=1);
 
 namespace App\Domain\Shared;
 
-abstract class ValidationException extends \InvalidArgumentException
-{
-}
+abstract class ValidationException extends \InvalidArgumentException {}

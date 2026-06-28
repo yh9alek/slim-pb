@@ -14,9 +14,8 @@ use PDO;
 final readonly class PdoTaskRepository implements TaskRepository
 {
     public function __construct(
-        private readonly PDO $pdo
-    ) {
-    }
+        private readonly PDO $pdo,
+    ) {}
 
     /**
      * returns Task[]
@@ -68,7 +67,7 @@ final readonly class PdoTaskRepository implements TaskRepository
     public function update(Task $task): Task
     {
         $stmt = $this->pdo->prepare(
-            'UPDATE tasks SET title = :title, completed = :completed WHERE id = :id;'
+            'UPDATE tasks SET title = :title, completed = :completed WHERE id = :id;',
         );
 
         $stmt->bindValue(':title',     $task->title,     PDO::PARAM_STR);

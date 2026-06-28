@@ -8,7 +8,7 @@ use PhpCsFixer\Finder;
 return (new Config())
     ->setRiskyAllowed(false)
     ->setRules([
-        '@PSR12' => true,
+        '@PER' => true,
         'method_argument_space' => [
             'keep_multiple_spaces_after_comma' => true,
         ],

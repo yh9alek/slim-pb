@@ -46,8 +46,8 @@ return [
     },
 
     // Almacén de contadores del rate limiter.
-    RateLimiterStore::class => fn (): RateLimiterStore =>
-        new FileRateLimiterStore(__DIR__ . '/../var/cache/throttle'),
+    RateLimiterStore::class => fn(): RateLimiterStore
+        => new FileRateLimiterStore(__DIR__ . '/../var/cache/throttle'),
 
     // Middleware de throttling configurado desde settings (límite global).
     ThrottleMiddleware::class => function (ContainerInterface $c): ThrottleMiddleware {

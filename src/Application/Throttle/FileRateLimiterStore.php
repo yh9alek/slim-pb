@@ -9,9 +9,7 @@ namespace App\Application\Throttle;
 // que el incremento sea atómico entre procesos.
 final readonly class FileRateLimiterStore implements RateLimiterStore
 {
-    public function __construct(private string $directory)
-    {
-    }
+    public function __construct(private string $directory) {}
 
     public function hit(string $key, int $window): RateLimit
     {

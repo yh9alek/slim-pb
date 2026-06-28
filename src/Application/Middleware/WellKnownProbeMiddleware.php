@@ -23,8 +23,7 @@ final class WellKnownProbeMiddleware implements MiddlewareInterface
 
     public function __construct(
         private readonly ResponseFactoryInterface $responseFactory,
-    ) {
-    }
+    ) {}
 
     public function process(Request $request, Handler $handler): Response
     {

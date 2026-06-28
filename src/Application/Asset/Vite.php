@@ -19,8 +19,7 @@ final class Vite
         private readonly string $hotFile,
         private readonly string $manifestPath,
         private readonly string $buildBase,
-    ) {
-    }
+    ) {}
 
     public function tags(string ...$entries): string
     {

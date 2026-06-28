@@ -22,8 +22,7 @@ final class ThrottleMiddleware implements MiddlewareInterface
         private readonly int $limit,
         private readonly int $window,
         private readonly string $name = 'global',
-    ) {
-    }
+    ) {}
 
     public function process(Request $request, Handler $handler): Response
     {

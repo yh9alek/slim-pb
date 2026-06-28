@@ -17,8 +17,7 @@ final readonly class TaskService
     public function __construct(
         private readonly TaskRepository $tasks,
         private readonly LoggerInterface $logger,
-    ) {
-    }
+    ) {}
 
     /**
      * @return Task[]
