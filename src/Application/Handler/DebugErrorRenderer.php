@@ -137,7 +137,7 @@ final class DebugErrorRenderer
                     font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
                     font-size: 0.82rem; line-height: 1.65;
                 }
-                .line { display: flex; min-width: 100%; width: max-content; }
+                .line { display: flex; min-width: 100%; width: max-content; gap: 0.9rem; }
                 .line--active { background: var(--line); }
                 .ln {
                     position: sticky; left: 0; flex: none; width: 3.5ch; text-align: right; padding: 0 1rem;
@@ -212,6 +212,7 @@ final class DebugErrorRenderer
             <script>
                 (function () {
                     var root = document.documentElement;
+                    root.classList.toggle('dark');
                     var toggle = document.querySelector('[data-theme-toggle]');
                     if (toggle) toggle.addEventListener('click', function () { root.classList.toggle('dark'); });
 
