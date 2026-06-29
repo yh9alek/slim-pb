@@ -212,7 +212,11 @@ final class DebugErrorRenderer
             <script>
                 (function () {
                     var root = document.documentElement;
-                    root.classList.toggle('dark');
+                    const sistemaEsOscuro = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+                    if (sistemaEsOscuro) {
+                      root.classList.toggle('dark');
+                    }
                     var toggle = document.querySelector('[data-theme-toggle]');
                     if (toggle) toggle.addEventListener('click', function () { root.classList.toggle('dark'); });
 
@@ -248,8 +252,19 @@ final class DebugErrorRenderer
     private function buildFrames(Throwable $e): array
     {
         $trace = $e->getTrace();
+        $first = $trace[0] ?? null;
 
-        $frames = [$this->frame($e->getFile(), $e->getLine(), $this->fnLabel($trace[0] ?? null))];
+        $frames = [];
+
+        // El frame del lugar de lanzamiento solo se añade si NO coincide con el
+        // primer frame de la traza; si coinciden (p. ej. excepciones lanzadas
+        // por funciones internas como PDO), evitamos duplicarlo.
+        if ($first === null
+            || ($first['file'] ?? null) !== $e->getFile()
+            || ($first['line'] ?? null) !== $e->getLine()
+        ) {
+            $frames[] = $this->frame($e->getFile(), $e->getLine(), $this->fnLabel($first));
+        }
 
         foreach ($trace as $t) {
             if (!isset($t['file'])) {
