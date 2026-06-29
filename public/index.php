@@ -23,6 +23,7 @@ $builder = new ContainerBuilder();
 $builder->addDefinitions(require __DIR__ . '/../config/settings.php');
 $builder->addDefinitions(require __DIR__ . '/../config/dependencies.php');
 $builder->addDefinitions(require __DIR__ . '/../config/repositories.php');
+$builder->addDefinitions(require __DIR__ . '/../config/validation.php');
 $builder->addDefinitions(require __DIR__ . '/../config/views.php');
 
 if (($_ENV['APP_ENV'] ?? 'dev') === 'prod') {
@@ -50,9 +51,6 @@ $errorHandler = new HttpErrorHandler(
 
 # 6. Red de seguridad para errores fatales que escapan al ErrorMiddleware.
 register_shutdown_function(new ShutdownHandler($request, $errorHandler, $displayErrorDetails));
-
-# A partir de aquí, PHP no imprime errores crudos. Evita que la salida de PHP se desborde en la página.
-ini_set('display_errors', '0');
 
 # 7. Pipeline de middleware, rutas de API y rutas web (HTML)
 (require __DIR__ . '/../config/middleware.php')($app, $errorHandler);

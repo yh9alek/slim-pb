@@ -7,6 +7,7 @@ namespace App\Application\Controller;
 use App\Application\DTO\TaskInput;
 use App\Application\Service\TaskService;
 use App\Application\Shared\Api;
+use App\Application\Validation\Validator;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -14,6 +15,7 @@ final class TaskController extends Api
 {
     public function __construct(
         private readonly TaskService $service,
+        private readonly Validator $validator,
     ) {}
 
     public function index(Request $request, Response $response): Response
@@ -35,9 +37,10 @@ final class TaskController extends Api
 
     public function store(Request $request, Response $response): Response
     {
-        $input = TaskInput::validate(
-            (array) $request->getParsedBody(),
-        );
+        $input = TaskInput::get((array) $request->getParsedBody());
+
+        // Si falla, lanza ValidationException -> HttpErrorHandler -> 422 JSON.
+        $this->validator->validate($input);
 
         return $this->json($response, [
             'data' => $this->service->create($input),
@@ -52,9 +55,9 @@ final class TaskController extends Api
     {
         $this->service->find((int) $args['id']);
 
-        $input = TaskInput::validate(
-            (array) $request->getParsedBody(),
-        );
+        $input = TaskInput::get((array) $request->getParsedBody());
+
+        $this->validator->validate($input);
 
         $updated = $this->service->update(
             (int) $args['id'],
@@ -63,7 +66,7 @@ final class TaskController extends Api
 
         return $this->json($response, [
             'data' => $updated,
-            'meg'  => 'Se actualizó la tarea con éxito.',
+            'msg'  => 'Se actualizó la tarea con éxito.',
         ]);
     }
 

@@ -4,34 +4,33 @@ declare(strict_types=1);
 
 namespace App\Application\DTO;
 
-use App\Domain\Task\Exception\TaskValidationException;
+use Symfony\Component\Validator\Constraints as Assert;
 
+// El DTO ya no valida: solo DECLARA sus reglas mediante atributos.
+// La validación la ejecuta el servicio Validator (Symfony), de forma
+// que el "qué" (reglas) y el "cómo" (motor) quedan separados.
 final class TaskInput
 {
     public function __construct(
-        public string $title,
+        #[Assert\NotBlank(message: 'El título es obligatorio.')]
+        #[Assert\Length(
+            max: 255,
+            maxMessage: 'El título no puede superar {{ limit }} caracteres.',
+        )]
+        public string $title = '',
         public bool $completed = false,
     ) {}
 
     /**
+     * Mapea datos crudos de la petición al DTO (sin validar todavía).
+     *
      * @param array<string, mixed> $data
-     * @throws TaskValidationException
      */
-    public static function validate(array $data): self
+    public static function get(array $data): self
     {
-        $title = (string) ($data['title'] ?? '');
-
-        if (trim($title) === '') {
-            throw new TaskValidationException('El título es obligatorio.');
-        }
-
-        if (mb_strlen($title) > 255) {
-            throw new TaskValidationException('El campo "title" no puede superar 255 caracteres.');
-        }
-
         return new self(
-            $title,
-            (bool) ($data['completed'] ?? false),
+            title: trim((string) ($data['title'] ?? '')),
+            completed: filter_var($data['completed'] ?? false, FILTER_VALIDATE_BOOL),
         );
     }
 }

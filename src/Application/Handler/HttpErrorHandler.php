@@ -127,7 +127,6 @@ final class HttpErrorHandler extends ErrorHandler
     private function renderDebug(): ?string
     {
         try {
-            // dirname(__DIR__, 3): desde src/Application/Handler -> raíz del proyecto.
             return (new DebugErrorRenderer(\dirname(__DIR__, 3)))
                 ->render($this->exception, $this->request);
         } catch (Throwable) {
@@ -154,7 +153,15 @@ final class HttpErrorHandler extends ErrorHandler
             default                             => 'Error interno del servidor.',
         };
 
-        $payload = ['error' => ['status' => $status, 'message' => $message]];
+        $error = ['status' => $status, 'message' => $message];
+
+        // En validación, adjuntamos el detalle por campo para que el
+        // cliente pueda pintar los mensajes junto a cada input.
+        if ($exception instanceof ValidationException && $exception->errors() !== []) {
+            $error['errors'] = $exception->errors();
+        }
+
+        $payload = ['error' => $error];
 
         $response = $this->responseFactory->createResponse($status);
         $response->getBody()->write(json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));

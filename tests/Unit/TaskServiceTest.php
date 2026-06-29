@@ -43,5 +43,5 @@ it('lanza una excepción al buscar una tarea inexistente', function (): void {
 })->throws(TaskNotFoundException::class);
 
 it('rechaza un título vacío al construir el DTO', function (): void {
-    TaskInput::validate(['title' => '   ']);
+    TaskInput::get(['title' => '   ']);
 })->throws(TaskValidationException::class);
