@@ -4,9 +4,14 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build": "vite build",
+        "dev:all": "concurrently -k -n server,vite -c \"#93c5fd,#fdba74\" \"composer serve\" \"bun run dev\""
     },
     "devDependencies": {
-        "vite": "^8.0"
+        "vite": "^8.1.4"
+    },
+    "dependencies": {
+        "concurrently": "^10.0.3",
+        "dotenv": "^17.4.2"
     }
 }

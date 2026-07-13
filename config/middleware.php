@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Application\Handler\HttpErrorHandler;
-use App\Application\Middleware\JsonBodyParserMiddleware;
-use App\Application\Middleware\ThrottleMiddleware;
-use App\Application\Middleware\WellKnownProbeMiddleware;
-use App\Application\Settings\SettingsInterface;
+use App\Application\Core\Handler\HttpErrorHandler;
+use App\Application\Core\Middleware\JsonBodyParserMiddleware;
+use App\Application\Core\Middleware\ThrottleMiddleware;
+use App\Application\Core\Middleware\WellKnownProbeMiddleware;
+use App\Application\Core\Settings\SettingsInterface;
 use Psr\Log\LoggerInterface;
 use Slim\App;
 use Slim\Views\Twig;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Persistence;
 
-use App\Domain\Task\Exception\TaskNotFoundException;
+use App\Domain\Shared\NotFoundException;
 use App\Domain\Task\Task;
 use App\Domain\Task\TaskRepository;
 
@@ -22,7 +22,7 @@ final class InMemoryTaskRepository implements TaskRepository
 
     public function findById(int $id): Task
     {
-        return $this->tasks[$id] ?? throw TaskNotFoundException::withId($id);
+        return $this->tasks[$id] ?? throw new NotFoundException('Tarea no encontrada.');
     }
 
     public function save(Task $task): Task

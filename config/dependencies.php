@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Application\Middleware\ThrottleMiddleware;
-use App\Application\Settings\SettingsInterface;
-use App\Application\Throttle\FileRateLimiterStore;
-use App\Application\Throttle\RateLimiterStore;
+use App\Application\Core\Middleware\ThrottleMiddleware;
+use App\Application\Core\Settings\SettingsInterface;
+use App\Application\Core\Throttle\FileRateLimiterStore;
+use App\Application\Core\Throttle\RateLimiterStore;
 use Monolog\Formatter\LineFormatter;
-use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Monolog\Processor\UidProcessor;
@@ -23,14 +22,6 @@ return [
 
         $logger = new Logger($cfg['name']);
         $logger->pushProcessor(new UidProcessor());
-
-        // En desarrollo NO se escribe en app.log: el DebugErrorRenderer ya
-        // muestra los errores en pantalla. El archivo se usa solo en producción.
-        if ($settings->get('displayErrorDetails')) {
-            $logger->pushHandler(new NullHandler());
-
-            return $logger;
-        }
 
         $handler = new StreamHandler($cfg['path'], $cfg['level']);
         $handler->setFormatter(new LineFormatter(

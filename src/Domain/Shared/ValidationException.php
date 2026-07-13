@@ -7,6 +7,7 @@ namespace App\Domain\Shared;
 // Categoría de error de validación. Sigue siendo abstracta: solo se
 // instancian sus subtipos concretos. Ahora transporta, además del
 // mensaje, un mapa campo => mensajes para alimentar APIs y formularios.
+/** @phpstan-consistent-constructor */
 abstract class ValidationException extends \InvalidArgumentException
 {
     /** @var array<string, list<string>> */

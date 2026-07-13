@@ -9,7 +9,7 @@ arch('el dominio se mantiene agnóstico')
     ->not->toUse(['Slim', 'PDO', 'App\Infrastructure', 'App\Application']);
 
 arch('las acciones no acceden a PDO directamente')
-    ->expect('App\Application\Action')
+    ->expect('App\Application\Http\Action')
     ->not->toUse('PDO');
 
 arch('no quedan funciones de depuración en el código')

@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Application\Validation\SymfonyValidator;
-use App\Application\Validation\Validator;
+use App\Application\Core\Validation\SymfonyValidator;
+use App\Application\Core\Validation\Validator;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 

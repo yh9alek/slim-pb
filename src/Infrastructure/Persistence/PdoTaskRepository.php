@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Persistence;
 
-use App\Domain\Task\Exception\TaskNotFoundException;
+use App\Domain\Shared\NotFoundException;
 use App\Domain\Task\Task;
 use App\Domain\Task\TaskRepository;
 use PDO;
@@ -41,7 +41,7 @@ final readonly class PdoTaskRepository implements TaskRepository
         $row = $stmt->fetch();
 
         if ($row === false) {
-            throw TaskNotFoundException::withId($id);
+            throw new NotFoundException('Tarea no encontrada.');
         }
 
         return $this->hydrate($row);

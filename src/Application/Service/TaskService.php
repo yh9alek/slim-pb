@@ -46,13 +46,11 @@ final readonly class TaskService
 
     public function update(int $id, TaskInput $input): Task
     {
-
         $existing = $this->tasks->findById($id);
 
         $new = new Task(
             $existing->id,
-            $input->title,
-            $input->completed,
+            ...(array) $input,
         );
 
         $updated = $this->tasks->update($new);

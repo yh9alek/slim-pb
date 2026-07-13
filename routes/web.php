@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 
-use App\Application\Controller\WebController;
-use App\Application\Controller\TaskWebController;
+use App\Application\Http\Controller\WebController;
+use App\Application\Http\Controller\TaskWebController;
 use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\App;

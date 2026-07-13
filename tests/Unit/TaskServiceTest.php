@@ -2,16 +2,21 @@
 
 declare(strict_types=1);
 
+use App\Application\Core\Validation\SymfonyValidator;
+use Symfony\Component\Validator\Validation;
 use App\Application\DTO\TaskInput;
 use App\Application\Service\TaskService;
-use App\Domain\Task\Exception\TaskNotFoundException;
-use App\Domain\Task\Exception\TaskValidationException;
+use App\Domain\Shared\NotFoundException;
+use App\Domain\Shared\ValidationException;
 use App\Infrastructure\Persistence\InMemoryTaskRepository;
 use Psr\Log\NullLogger;
 
 beforeEach(function (): void {
     // El repositorio en memoria nos da un servicio testeable sin tocar la BD.
     $this->service = new TaskService(new InMemoryTaskRepository(), new NullLogger());
+    $this->validator = new SymfonyValidator(
+        Validation::createValidatorBuilder()->enableAttributeMapping()->getValidator(),
+    );
 });
 
 it('crea una tarea y le asigna un id', function (): void {
@@ -40,8 +45,16 @@ it('actualiza una tarea existente', function (): void {
 
 it('lanza una excepción al buscar una tarea inexistente', function (): void {
     $this->service->find(999);
-})->throws(TaskNotFoundException::class);
+})->throws(NotFoundException::class);
 
-it('rechaza un título vacío al construir el DTO', function (): void {
-    TaskInput::get(['title' => '   ']);
-})->throws(TaskValidationException::class);
+it('rechaza un título vacío', function (): void {
+    $this->validator->validate(TaskInput::get(['title' => '   ']));
+})->throws(ValidationException::class);
+
+it('expone los errores por campo', function (): void {
+    try {
+        $this->validator->validate(TaskInput::get(['title' => '']));
+    } catch (ValidationException $e) {
+        expect($e->errors())->toHaveKey('title');
+    }
+});

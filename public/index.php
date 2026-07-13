@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Application\Handler\HttpErrorHandler;
-use App\Application\Handler\ShutdownHandler;
-use App\Application\Settings\SettingsInterface;
+use App\Application\Core\Handler\HttpErrorHandler;
+use App\Application\Core\Handler\ShutdownHandler;
+use App\Application\Core\Settings\SettingsInterface;
 use DI\ContainerBuilder;
 use Dotenv\Dotenv;
 use Psr\Log\LoggerInterface;
@@ -51,6 +51,7 @@ $errorHandler = new HttpErrorHandler(
 
 # 6. Red de seguridad para errores fatales que escapan al ErrorMiddleware.
 register_shutdown_function(new ShutdownHandler($request, $errorHandler, $displayErrorDetails));
+ini_set('display_errors', 0);
 
 # 7. Pipeline de middleware, rutas de API y rutas web (HTML)
 (require __DIR__ . '/../config/middleware.php')($app, $errorHandler);

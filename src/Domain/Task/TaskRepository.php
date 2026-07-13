@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Task;
 
-use App\Domain\Task\Exception\TaskNotFoundException;
+use App\Domain\Shared\NotFoundException;
 
 // Contrato de persistencia. El dominio define QUÉ necesita;
 // la infraestructura decide CÓMO se cumple.
@@ -16,7 +16,7 @@ interface TaskRepository
     public function findAll(): array;
 
     /**
-     * @throws TaskNotFoundException
+     * @throws NotFoundException
      */
     public function findById(int $id): Task;
 

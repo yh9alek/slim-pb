@@ -1,5 +1,7 @@
 import { defineConfig } from 'vite';
 import fs from 'node:fs';
+import { slimBanner, createSlimLogger } from './slim-banner.js';
+import { slimWelcome } from './slim-welcome.js';
 
 const hotFile = 'public/hot';
 
@@ -37,7 +39,10 @@ function phpDevServer() {
 export default defineConfig(({ command }) => ({
     base: command === 'build' ? '/build/' : '/',
 
-    plugins: [phpDevServer()],
+    plugins: [phpDevServer(), slimBanner(), slimWelcome()],
+
+    // Recolorea el token "VITE vX" a #4E69FB en la salida de dev.
+    customLogger: createSlimLogger(),
 
     server: {
         host: 'localhost',

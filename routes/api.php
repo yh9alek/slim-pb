@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Application\Controller\TaskController;
+use App\Application\Http\Controller\TaskController;
 use Slim\App;
 use Slim\Interfaces\RouteCollectorProxyInterface as Group;
 

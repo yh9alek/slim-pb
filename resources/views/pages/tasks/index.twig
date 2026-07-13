@@ -1,0 +1,40 @@
+{% extends 'layouts/layout.twig' %}
+
+{% block title %} Tareas {% endblock %}
+
+{% block head %}
+    {{ vite('resources/js/tasks/presentation/tasks-page.js') }}
+{% endblock %}
+
+{% block content %}
+    <h1>Tareas</h1>
+
+    <div class="toolbar">
+        <input type="search" data-filter-text placeholder="Filtrar por título…" class="toolbar__search">
+        <label class="toolbar__check">
+            <input type="checkbox" data-filter-pending> Solo pendientes
+        </label>
+        <span class="toolbar__count"><strong data-count>0</strong> visibles</span>
+    </div>
+
+    {% if tasks is empty %}
+        <p class="empty">No hay tareas todavía.</p>
+    {% else %}
+        <ul class="tasks" data-tasks>
+            {% for task in tasks %}
+                <li class="task{{ task.completed ? ' task--done' : '' }}"
+                    data-id="{{ task.id }}"
+                    data-title="{{ task.title }}"
+                    data-completed="{{ task.completed ? 'true' : 'false' }}">
+                    <span class="task__title">{{ task.title }}</span>
+                    <span class="task__actions">
+                        <button type="button" data-action="toggle">
+                            {{ task.completed ? 'Reabrir' : 'Completar' }}
+                        </button>
+                        <button type="button" data-action="delete" class="danger">Eliminar</button>
+                    </span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}
