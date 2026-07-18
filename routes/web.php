@@ -18,7 +18,6 @@ return function (App $app): void {
     $app->get('/health', fn(Request $request, Response $response): Response => $response->withStatus(204));
 
     # TASKS
-    $app->get('/tasks',                  [TaskWebController::class, 'index']);
-    $app->get('/tasks/create',           [TaskWebController::class, 'create']);
-    $app->get('/tasks/{id:[0-9]+}/edit', [TaskWebController::class, 'edit']);
+    $app->get('/tasks',        [TaskWebController::class, 'index']);
+    $app->get('/tasks/create', [TaskWebController::class, 'create']);
 };

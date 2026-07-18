@@ -29,15 +29,4 @@ final class TaskWebController
     {
         return $this->twig->render($response, 'pages/tasks/create.twig');
     }
-
-    public function store(Request $request, Response $response): Response
-    {
-        $input = TaskInput::get((array) $request->getParsedBody());
-
-        $this->service->create($input);
-
-        return $response
-            ->withHeader('Location', '/tasks')
-            ->withStatus(302);
-    }
 }

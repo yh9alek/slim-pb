@@ -1,5 +1,5 @@
 {
-    "name": "yh9pl/pb",
+    "name": "yh9alek/slim-pb",
     "description": "Backend PHP con Slim 4",
     "type": "project",
     "license": "proprietary",
@@ -7,6 +7,7 @@
         "php": ">=8.4.1",
         "monolog/monolog": "^3.5",
         "php-di/php-di": "^7.0",
+        "robmorgan/phinx": "^0.16.12",
         "slim/psr7": "^1.6",
         "slim/slim": "^4.12",
         "slim/twig-view": "^3.4",
@@ -14,6 +15,7 @@
         "vlucas/phpdotenv": "^5.6"
     },
     "require-dev": {
+        "fakerphp/faker": "^1.24",
         "friendsofphp/php-cs-fixer": "^3.95",
         "pestphp/pest": "^4.7.3",
         "phpstan/phpstan": "^2.2"
@@ -37,6 +39,15 @@
             "Composer\\Config::disableProcessTimeout",
             "node serve.mjs"
         ],
+
+        "migrate": "phinx migrate",
+        "migrate:rollback": "phinx rollback",
+        "migrate:status": "phinx status",
+        "migrate:create": "phinx create",
+
+        "seed:create": "phinx seed:create",
+        "seed": "phinx seed:run",
+
         "cs:fix": "php-cs-fixer fix",
         "phpstan": "phpstan analyse --memory-limit=2G",
         "test": "pest",

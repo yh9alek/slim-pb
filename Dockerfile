@@ -5,7 +5,7 @@
 # Centralizar aqui la version de PHP y las extensiones evita duplicarlas y
 # garantiza que Composer resuelva las mismas platform-reqs que tendra produccion.
 # =============================================================================
-FROM php:8.3-fpm-alpine AS base
+FROM php:8.4-fpm-alpine AS base
 
 # install-php-extensions gestiona extensiones (y sus libs de sistema) de forma
 # limpia, tanto en Alpine como en Debian.
