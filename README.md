@@ -5,7 +5,7 @@
 # slim-pb
 
 Backend PHP con **Slim 4** por capas + frontend con **Vite 8**, Tailwind CSS y
-DaisyUI. Las vistas se renderizan en el servidor (Twig) y el JavaScript solo
+DaisyUI. Las vistas se renderizan en el servidor (Twig) y JavaScript solo
 añade interactividad encima.
 
 Incluye una API JSON y una interfaz web sobre el mismo recurso (`tasks`).
