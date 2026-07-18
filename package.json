@@ -8,10 +8,15 @@
         "dev:all": "concurrently -k -n server,vite -c \"#93c5fd,#fdba74\" \"composer serve\" \"bun run dev\""
     },
     "devDependencies": {
-        "vite": "^8.1.4"
+        "@tailwindcss/vite": "^4.3.3",
+        "daisyui": "^5.6.18",
+        "tailwindcss": "^4.3.3",
+        "vite": "^8.1.5"
     },
     "dependencies": {
+        "axios": "^1.18.1",
         "concurrently": "^10.0.3",
-        "dotenv": "^17.4.2"
+        "dotenv": "^17.4.2",
+        "sweetalert2": "^11.26.25"
     }
 }

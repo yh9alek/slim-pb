@@ -30,7 +30,7 @@ final class TaskInput
     {
         return new self(
             title: trim((string) ($data['title'] ?? '')),
-            completed: $data['completed'] ?? false,
+            completed: (bool) @($data['completed'] ?? false),
         );
     }
 }

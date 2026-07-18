@@ -1,9 +1,13 @@
 import { defineConfig } from 'vite';
-import fs from 'node:fs';
 import { slimBanner, createSlimLogger } from './slim-banner.js';
 import { slimWelcome } from './slim-welcome.js';
+import tailwindcss from '@tailwindcss/vite';
+
+import fs from 'node:fs';
+import path from 'node:path';
 
 const hotFile = 'public/hot';
+const jsDir = 'templates/js';
 
 function phpDevServer() {
     return {
@@ -36,10 +40,29 @@ function phpDevServer() {
     };
 }
 
+function findPageEntries() {
+    const entries = [];
+
+    for (const module of fs.readdirSync(jsDir, { withFileTypes: true })) {
+        if (!module.isDirectory()) continue;
+
+        const presentation = path.posix.join(jsDir, module.name, 'presentation');
+        if (!fs.existsSync(presentation)) continue;
+
+        for (const file of fs.readdirSync(presentation)) {
+            if (file.endsWith('.js')) {
+                entries.push(path.posix.join(presentation, file));
+            }
+        }
+    }
+
+    return entries;
+}
+
 export default defineConfig(({ command }) => ({
     base: command === 'build' ? '/build/' : '/',
 
-    plugins: [phpDevServer(), slimBanner(), slimWelcome()],
+    plugins: [tailwindcss(), phpDevServer(), slimBanner(), slimWelcome()],
 
     // Recolorea el token "VITE vX" a #4E69FB en la salida de dev.
     customLogger: createSlimLogger(),
@@ -63,10 +86,7 @@ export default defineConfig(({ command }) => ({
         outDir: 'public/build',
         emptyOutDir: true,
         rollupOptions: {
-            input: {
-                app: 'resources/js/app.js',
-                tasks: 'resources/js/tasks.js',
-            },
+            input: ['templates/js/app.js', ...findPageEntries()],
         },
     },
 }));

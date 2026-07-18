@@ -21,7 +21,7 @@ return [
         ],
         // Throttling: nº de peticiones por ventana (segundos), por IP.
         'throttle' => [
-            'limit' => (int) ($_ENV['THROTTLE_LIMIT'] ?? 30),
+            'limit' => (int) ($_ENV['THROTTLE_LIMIT'] ?? 60),
             'window' => (int) ($_ENV['THROTTLE_WINDOW'] ?? 60),
         ],
     ]),

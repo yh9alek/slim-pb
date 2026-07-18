@@ -1,14 +1,10 @@
-import '../../../css/tasks.css';
 import store from '../store/store';
-import { toggleTask, deleteTask } from '../use-cases';
-
-// Capa de presentación de la vista de tareas. NO crea el HTML (eso lo
-// hace Twig en el servidor): realza el DOM ya renderizado. Este archivo
-// es el entry de Vite de la vista (Pattern A).
+import { toggleTask, deleteTask, renderEmpty } from '../use-cases';
 
 const list = document.querySelector('[data-tasks]');
 
 if (list) {
+
     // 1) Hidratar el estado desde los <li> que renderizó el servidor.
     store.hydrate(
         [...list.querySelectorAll('li[data-id]')].map((li) => ({
@@ -20,11 +16,23 @@ if (list) {
 
     // 2) Acciones, delegadas en la lista (sirven aunque cambien los <li>).
     list.addEventListener('click', (e) => {
-        const li = e.target.closest('li[data-id]');
-        if (!li) return;
+        const id = e.target.closest('li[data-id]');
+        if (!id) return;
 
-        if (e.target.matches('[data-action="toggle"]')) toggleTask(li);
-        if (e.target.matches('[data-action="delete"]')) deleteTask(li);
+        if (e.target.matches('[data-action="toggle"]')) {
+            toggleTask(id);
+        };
+        if (e.target.matches('[data-action="delete"]')) {
+            deleteTask(id);
+
+            const count = store.getCount();
+
+            document.querySelector('[data-count]').textContent = String(count);
+
+            if (count <= 0) {
+                renderEmpty();
+            }
+        }
     });
 
     // 3) Filtros: estado de vista, solo muestran/ocultan <li>.

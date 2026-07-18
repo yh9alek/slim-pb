@@ -2,6 +2,7 @@
     "name": "yh9pl/pb",
     "description": "Backend PHP con Slim 4",
     "type": "project",
+    "license": "proprietary",
     "require": {
         "php": ">=8.4.1",
         "monolog/monolog": "^3.5",
@@ -36,15 +37,10 @@
             "Composer\\Config::disableProcessTimeout",
             "node serve.mjs"
         ],
-        "test": "pest",
-        "test:coverage": "pest --coverage",
-        "cs:check": "php-cs-fixer check --diff",
         "cs:fix": "php-cs-fixer fix",
         "phpstan": "phpstan analyse --memory-limit=2G",
-        "lint": [
-            "@cs:check",
-            "@phpstan"
-        ]
+        "test": "pest",
+        "test:coverage": "pest --coverage"
     },
     "config": {
         "sort-packages": true,

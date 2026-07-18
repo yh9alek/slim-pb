@@ -37,6 +37,7 @@ final readonly class TaskService
         $saved = $this->tasks->save(new Task(
             id: null,
             title: $input->title,
+            completed: $input->completed,
         ));
 
         $this->logger->info('Tarea creada', ['id' => $saved->id]);
