@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Application\Settings\SettingsInterface;
+use App\Application\Core\Middleware\ThrottleMiddleware;
+use App\Application\Core\Settings\SettingsInterface;
+use App\Application\Core\Throttle\FileRateLimiterStore;
+use App\Application\Core\Throttle\RateLimiterStore;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -14,7 +17,11 @@ return [
 
     // Logger PSR-3
     LoggerInterface::class => function (ContainerInterface $c): LoggerInterface {
-        $cfg = $c->get(SettingsInterface::class)->get('logger');
+        $settings = $c->get(SettingsInterface::class);
+        $cfg = $settings->get('logger');
+
+        $logger = new Logger($cfg['name']);
+        $logger->pushProcessor(new UidProcessor());
 
         $handler = new StreamHandler($cfg['path'], $cfg['level']);
         $handler->setFormatter(new LineFormatter(
@@ -23,9 +30,6 @@ return [
             allowInlineLineBreaks: true,
             ignoreEmptyContextAndExtra: true,
         ));
-
-        $logger = new Logger($cfg['name']);
-        $logger->pushProcessor(new UidProcessor());
         $logger->pushHandler($handler);
 
         return $logger;
@@ -40,5 +44,21 @@ return [
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 
         return $pdo;
+    },
+
+    // Almacén de contadores del rate limiter.
+    RateLimiterStore::class => fn(): RateLimiterStore
+        => new FileRateLimiterStore(__DIR__ . '/../var/cache/throttle'),
+
+    // Middleware de throttling configurado desde settings (límite global).
+    ThrottleMiddleware::class => function (ContainerInterface $c): ThrottleMiddleware {
+        $cfg = $c->get(SettingsInterface::class)->get('throttle');
+
+        return new ThrottleMiddleware(
+            $c->get(RateLimiterStore::class),
+            $c->get(LoggerInterface::class),
+            (int) $cfg['limit'],
+            (int) $cfg['window'],
+        );
     },
 ];

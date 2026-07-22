@@ -1,0 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap');
+
+@import "tailwindcss";
+@plugin "daisyui" {
+    themes: light --default, dark --prefersdark;
+}
+
+* { font-family: 'Google Sans'; }
+
+@layer utilities {
+
+  .material-symbols-rounded {
+      opacity: 0;
+      font-size: 0 !important;
+      transition: opacity 0.15s ease;
+  }
+
+  .fonts-loaded .material-symbols-rounded {
+      opacity: 1;
+      font-size: 20px !important;
+  }
+
+  .material-symbols-rounded {
+    font-variation-settings:
+        'FILL' 0,
+        'wght' 280,
+        'GRAD' 0,
+        'opsz' 24;
+  }
+
+  .icon-filled {
+    font-variation-settings:
+        'FILL' 1,
+        'wght' 280,
+        'GRAD' 0,
+        'opsz' 24;
+  }
+}

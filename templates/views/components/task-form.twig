@@ -1,0 +1,41 @@
+{% macro taskForm(action, titulo) %}
+<form id="task-form" class="card bg-base-100 shadow-md max-w-md mx-auto mt-20 w-full" action="{{ action }}" method="POST">
+    <div class="card-body gap-4">
+        <h2 class="card-title">{{ titulo }}</h2>
+
+        <div class="form-control">
+            <label class="label mb-2" for="title">
+                <span class="label-text">Título: *</span>
+            </label>
+            <input
+                type="text"
+                id="title"
+                name="title"
+                class="input input-bordered w-full"
+                placeholder="Preparar informe semanal"
+                maxlength="255"
+                required
+            />
+            <span class="input-error hidden text-red-500 text-[12px] mt-1"></span>
+        </div>
+
+        <div class="form-control">
+            <label class="label cursor-pointer justify-start gap-3" for="completed">
+                <input
+                type="checkbox"
+                id="completed"
+                name="completed"
+                value="1"
+                class="checkbox checkbox-primary"
+                />
+                <span class="label-text">Completada</span>
+            </label>
+        </div>
+
+        <div class="card-actions justify-end">
+            <button type="reset" class="btn btn-ghost">Limpiar</button>
+            <button id="btn-guardar" type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+    </div>
+</form>
+{% endmacro %}

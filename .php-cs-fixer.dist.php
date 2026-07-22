@@ -8,7 +8,7 @@ use PhpCsFixer\Finder;
 return (new Config())
     ->setRiskyAllowed(false)
     ->setRules([
-        '@PSR12' => true,
+        '@PER' => true,
         'method_argument_space' => [
             'keep_multiple_spaces_after_comma' => true,
         ],
@@ -21,7 +21,7 @@ return (new Config())
             // 💡 additional files, eg bin entry file
             // ->append([__DIR__.'/bin-entry-file'])
             // 💡 folders to exclude, if any
-            // ->exclude([/* ... */])
+            ->exclude(['var', 'resources', 'docker', 'node_modules'])
             // 💡 path patterns to exclude, if any
             // ->notPath([/* ... */])
             // 💡 extra configs

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Persistence;
 
-use App\Domain\Task\Exception\TaskNotFoundException;
+use App\Domain\Shared\NotFoundException;
 use App\Domain\Task\Task;
 use App\Domain\Task\TaskRepository;
 use PDO;
@@ -14,9 +14,8 @@ use PDO;
 final readonly class PdoTaskRepository implements TaskRepository
 {
     public function __construct(
-        private readonly PDO $pdo
-    ) {
-    }
+        private readonly PDO $pdo,
+    ) {}
 
     /**
      * returns Task[]
@@ -42,7 +41,7 @@ final readonly class PdoTaskRepository implements TaskRepository
         $row = $stmt->fetch();
 
         if ($row === false) {
-            throw TaskNotFoundException::withId($id);
+            throw new NotFoundException('Tarea no encontrada.');
         }
 
         return $this->hydrate($row);
@@ -68,7 +67,7 @@ final readonly class PdoTaskRepository implements TaskRepository
     public function update(Task $task): Task
     {
         $stmt = $this->pdo->prepare(
-            'UPDATE tasks SET title = :title, completed = :completed WHERE id = :id;'
+            'UPDATE tasks SET title = :title, completed = :completed WHERE id = :id;',
         );
 
         $stmt->bindValue(':title',     $task->title,     PDO::PARAM_STR);

@@ -1,0 +1,13 @@
+{% from '/components/task-form.twig' import taskForm %}
+
+{% extends 'layouts/layout.twig' %}
+
+{% block title %} Tareas {% endblock %}
+
+{% block head %}
+    {{ vite('templates/js/tasks/presentation/tasks-create.js') }}
+{% endblock %}
+
+{% block content %}
+    {{ taskForm('/tasks', 'Crear nueva tarea') }}
+{% endblock %}

@@ -17,8 +17,7 @@ final readonly class TaskService
     public function __construct(
         private readonly TaskRepository $tasks,
         private readonly LoggerInterface $logger,
-    ) {
-    }
+    ) {}
 
     /**
      * @return Task[]
@@ -38,6 +37,7 @@ final readonly class TaskService
         $saved = $this->tasks->save(new Task(
             id: null,
             title: $input->title,
+            completed: $input->completed,
         ));
 
         $this->logger->info('Tarea creada', ['id' => $saved->id]);
@@ -47,13 +47,11 @@ final readonly class TaskService
 
     public function update(int $id, TaskInput $input): Task
     {
-
         $existing = $this->tasks->findById($id);
 
         $new = new Task(
             $existing->id,
-            $input->title,
-            $input->completed,
+            ...(array) $input,
         );
 
         $updated = $this->tasks->update($new);
