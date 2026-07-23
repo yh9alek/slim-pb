@@ -32,6 +32,9 @@
         }
     },
     "scripts": {
+        "post-create-project-cmd": [
+            "@php scripts/setup.php"
+        ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
             "bun run dev:all"
