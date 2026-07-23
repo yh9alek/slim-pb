@@ -3,6 +3,7 @@
     "description": "Backend PHP con Slim 4",
     "type": "project",
     "license": "proprietary",
+    "minimum-stability": "stable",
     "require": {
         "php": ">=8.4.1",
         "monolog/monolog": "^3.5",

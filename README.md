@@ -14,23 +14,27 @@ Incluye una API JSON y una interfaz web sobre el mismo recurso (`tasks`).
 
 ## Stack
 
-| Capa       | Herramientas                                                        |
-| ---------- | ------------------------------------------------------------------- |
-| Backend    | PHP 8.4+, Slim 4, PHP-DI, Twig, Monolog, Symfony Validator, PDO     |
-| Frontend   | Vite 8, Tailwind CSS 4, DaisyUI 5, Axios, SweetAlert2               |
-| Calidad    | Pest, PHPStan (lvl 8), PHP-CS-Fixer (PER)                           |
-| Despliegue | Docker (PHP-FPM + Nginx), `deploy.sh`                               |
+| Capa       | Herramientas                                                          |
+| ---------- | --------------------------------------------------------------------- |
+| Backend    | PHP 8.4+, Slim 4, PHP-DI, Twig, Monolog, Symfony Validator, PDO       |
+| Frontend   | Vite 8, Tailwind CSS 4, DaisyUI 5, Axios, SweetAlert2                 |
+| Base datos | Phinx (migraciones y seeders), Faker                                  |
+| Calidad    | Pest, PHPStan (lvl 8), PHP-CS-Fixer (PER)                             |
+| Despliegue | Docker (PHP-FPM + Nginx), Apache/Nginx tradicional, `deploy.sh`       |
 
 ---
 
 ## Puesta en marcha
 
-Requisitos: PHP >= 8.4.1, Composer y [Bun](https://bun.sh).
+Requisitos: PHP >= 8.4.1, [Composer](https://getcomposer.org/) y [Bun](https://bun.sh).
 
 ```bash
-composer install
-bun install
-cp .env.example .env      # y rellena DB_DSN, DB_USER, DB_PASS
+composer install --no-scripts
+bun install --ignore-scripts
+cp .env.example .env      # indicar los valores de entorno a trabajar
+
+composer run migrate      # crea las tablas de la BD
+composer run seed         # opcional: datos de ejemplo
 
 composer run dev
 ```
@@ -56,6 +60,12 @@ de assets de Vite.
 ```
 public/index.php ............ Front controller: bootstrap, contenedor, app
 public/build/ ............... Assets compilados por Vite (generado)
+public/hot .................. Marca el modo dev de Vite (generado, efímero)
+public/.htaccess ............ Reescritura a index.php (Apache)
+
+bootstrap/app.php ........... Construye la app: contenedor, config, rutas
+server.php .................. Router del servidor embebido de PHP
+serve.mjs ................... Arranca el servidor PHP con salida formateada
 
 config/
   settings.php .............. Configuración leída del .env
@@ -68,6 +78,11 @@ config/
 routes/
   web.php ................... Rutas que devuelven HTML
   api.php ................... Rutas que devuelven JSON
+
+database/
+  migrations/ ............... Migraciones de Phinx
+  seeds/ .................... Seeders (DatabaseSeeder, TaskSeeder)
+phinx.php ................... Config de Phinx: deriva el adaptador del DB_DSN
 
 src/Domain/ ................. Núcleo sin framework
   Task/Task.php ............. Entidad
@@ -92,6 +107,10 @@ templates/
   views/ .................... Plantillas Twig (SSR)
   css/app.css ............... Tailwind + DaisyUI
   js/ ....................... Frontend por módulos (ver abajo)
+
+tests/
+  Unit/ ..................... Lógica de negocio aislada
+  Feature/ .................. Pila HTTP completa + reglas de arquitectura
 ```
 
 ---
@@ -100,13 +119,12 @@ templates/
 
 **Web (HTML)**
 
-| Método | Ruta                | Descripción            |
-| ------ | ------------------- | ---------------------- |
-| GET    | `/`                 | Página de bienvenida   |
-| GET    | `/tasks`            | Lista de tareas        |
-| GET    | `/tasks/create`     | Formulario de creación |
-| GET    | `/tasks/{id}/edit`  | Formulario de edición  |
-| GET    | `/health`           | Healthcheck (204)      |
+| Método | Ruta            | Descripción            |
+| ------ | --------------- | ---------------------- |
+| GET    | `/`             | Página de bienvenida   |
+| GET    | `/tasks`        | Lista de tareas        |
+| GET    | `/tasks/create` | Formulario de creación |
+| GET    | `/health`       | Healthcheck (204)      |
 
 **API (JSON)**
 
@@ -117,6 +135,8 @@ templates/
 | POST   | `/api/tasks`       | Crear             |
 | PUT    | `/api/tasks/{id}`  | Actualizar        |
 | DELETE | `/api/tasks/{id}`  | Eliminar (204)    |
+
+Las rutas de la API con `{id}` solo aceptan valores numéricos (`[0-9]+`).
 
 Los errores se devuelven siempre con la misma forma:
 
@@ -149,6 +169,28 @@ fuente y la traza.
 
 ---
 
+## Base de datos
+
+Las migraciones y los seeders se gestionan con **Phinx**. `phinx.php` reutiliza
+el mismo `DB_DSN` de la app y deriva el adaptador (`mysql`, `pgsql` o `sqlite`)
+a partir de él, así que no hay que configurar la conexión dos veces.
+
+```bash
+composer run migrate            # aplica las migraciones pendientes
+composer run migrate:rollback   # revierte la última
+composer run migrate:status     # estado de cada migración
+composer run migrate:create     # crea una migración nueva
+
+composer run seed               # ejecuta los seeders
+composer run seed:create        # crea un seeder nuevo
+```
+
+La migración inicial crea la tabla `tasks` (`id`, `title`, `completed`, además
+de `created_at` y `updated_at`). `TaskSeeder` la puebla con datos de ejemplo
+generados con Faker.
+
+---
+
 ## Frontend
 
 Un módulo por recurso, con la misma estructura siempre:
@@ -175,6 +217,10 @@ vista:
 {% endblock %}
 ```
 
+En desarrollo, Vite escribe `public/hot` con la URL de su servidor; la extensión
+`vite()` de Twig lo detecta para servir los assets desde el dev server, y cae al
+manifest de `public/build` cuando ese archivo no existe (producción).
+
 Los avisos al usuario están repartidos así: **modal** (SweetAlert2) para errores
 400/500 y de red, disparado automáticamente desde `lib/http.js`; **toast** para
 confirmaciones breves (`toast.success('Tarea eliminada')`).
@@ -188,22 +234,47 @@ composer run dev          # PHP + Vite a la vez (desarrollo)
 composer run serve        # solo el servidor PHP
 bun run build             # compila los assets a public/build
 
+composer run migrate      # migraciones (ver sección Base de datos)
+composer run seed         # seeders
+
 composer run cs:fix       # formateo de código
-composer run phpstan      # análisis estático
+composer run phpstan      # análisis estático (nivel 8)
 composer run test         # Pest
 composer run test:coverage
 ```
 
 ---
 
+## Tests
+
+Pest, con tres frentes:
+
+- **`tests/Unit`** — lógica de negocio aislada (`TaskServiceTest`).
+- **`tests/Feature/TaskApiTest`** — ejercita la pila HTTP completa (router,
+  middleware, validación, manejador de errores) contra
+  `InMemoryTaskRepository`, sin tocar la base de datos.
+- **`tests/Feature/ArchTest`** — reglas de arquitectura: el dominio no puede
+  depender de Slim, PDO, `App\Infrastructure` ni `App\Application`, y no deben
+  quedar funciones de depuración (`dd`, `dump`, `var_dump`, `ray`) en el código.
+
+Los helpers de `tests/Pest.php` (`testApp()`, `apiRequest()`, `jsonBody()`)
+construyen la app de pruebas y desactivan el throttling durante los tests.
+
+---
+
 ## Variables de entorno
 
 | Variable                            | Para qué                                         |
-| ---------------------------------   | -----------------------------------------        |
+| ----------------------------------- | ------------------------------------------------ |
+| `APP_NAME`                          | Nombre de la app                                 |
 | `APP_ENV`                           | `dev` o `prod` (activa errores detallados)       |
 | `APP_URL`                           | URL pública de la app                            |
-| `DB_DSN`, `DB_USER`, `DB_PASS`      | Conexión PDO                                     |
+| `VITE_APP_URL`                      | URL que consume Vite (por defecto, `${APP_URL}`) |
+| `DB_DSN`, `DB_USER`, `DB_PASS`      | Conexión PDO (y también la de Phinx)             |
 | `THROTTLE_LIMIT`, `THROTTLE_WINDOW` | Peticiones por IP y ventana (por defecto 60/60s) |
+
+`THROTTLE_LIMIT` y `THROTTLE_WINDOW` son opcionales: si no se definen, se usan
+los valores por defecto de `config/settings.php`.
 
 ---
 
@@ -227,5 +298,11 @@ docker build -t slim-pb .
 docker run -p 8080:80 --env-file .env slim-pb
 ```
 
-O sobre un servidor con `deploy.sh`, que hace `git pull`, instala dependencias,
-compila los assets y limpia la caché.
+Sobre un servidor tradicional, `deploy.sh` es idempotente y hace: `git pull`,
+instala dependencias PHP sin dev, ejecuta las migraciones, compila los assets,
+borra `public/hot`, limpia las cachés de PHP-DI y Twig, y ajusta permisos en
+`var/`.
+
+Para Apache hay un `apache-vhost.conf.example`. En cualquier servidor, el
+`DocumentRoot` debe apuntar a `public/`, nunca a la raíz del proyecto, para que
+`vendor/`, `config/` y `.env` queden fuera del alcance público.
