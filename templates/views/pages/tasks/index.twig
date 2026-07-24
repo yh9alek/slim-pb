@@ -64,7 +64,7 @@
                 {% else %}
                 {# Lista — el estado (completada/pendiente) lo pinta el CSS según
                     data-completed del <li>, con variantes group-data-*. #}
-                <ul class="divide-y divide-base-content/5" data-tasks>
+                <ul class="divide-y divide-base-content/5 max-h-[600px] overflow-y-scroll" data-tasks>
                     {% for task in tasks %}
                     <li class="task group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-base-200/40"
                         data-id="{{ task.id }}"
