@@ -4,34 +4,41 @@
 
 # slim-pb
 
-Backend PHP con **Slim 4** por capas + frontend con **Vite 8**, Tailwind CSS y
-DaisyUI. Las vistas se renderizan en el servidor (Twig) y JavaScript solo
-añade interactividad encima.
+Scaffold para arrancar proyectos Full Stack: backend PHP con **Slim 4** +
+frontend con **Vite 8**, Tailwind CSS y DaisyUI. Las vistas se renderizan en el
+servidor (SSR) usando Twig y JavaScript para añadir interactividad encima.
 
-Incluye una API JSON y una interfaz web sobre el mismo recurso (`tasks`).
+Trae un módulo de ejemplo (`tasks`) con API JSON e interfaz web sobre el mismo
+recurso. **El instalador pregunta si quieres conservarlo**; si lo descartas, el
+proyecto queda limpio y listo para tu primer módulo.
 
 ---
 
 ## Stack
 
-| Capa       | Herramientas                                                          |
-| ---------- | --------------------------------------------------------------------- |
-| Backend    | PHP 8.4+, Slim 4, PHP-DI, Twig, Monolog, Symfony Validator, PDO       |
-| Frontend   | Vite 8, Tailwind CSS 4, DaisyUI 5, Axios, SweetAlert2                 |
-| Base datos | Phinx (migraciones y seeders), Faker                                  |
-| Calidad    | Pest, PHPStan (lvl 8), PHP-CS-Fixer (PER)                             |
-| Despliegue | Docker (PHP-FPM + Nginx), Apache/Nginx tradicional, `deploy.sh`       |
+| Capa       | Herramientas                                                     |
+| ---------- | ---------------------------------------------------------------- |
+| Backend    | PHP 8.4+, Slim 4, PHP-DI, Twig, Monolog, Symfony Validator, PDO  |
+| Frontend   | Vite 8, Tailwind CSS 4, DaisyUI 5, Axios, SweetAlert2            |
+| Base datos | Phinx (migraciones y seeders), Faker                             |
+| Calidad    | Pest 4, PHPStan (lvl 8), PHP-CS-Fixer (PER)                      |
+| Despliegue | Docker (PHP-FPM + Nginx), Apache/Nginx tradicional, `deploy.sh`  |
 
 ---
 
-## Puesta en marcha
+## Crear un proyecto
 
 Requisitos: PHP >= 8.4.1, [Composer](https://getcomposer.org/) y [Bun](https://bun.sh).
 
 ```bash
-composer install --no-scripts
+composer create-project yh9alek/slim-pb mi-proyecto
+cd mi-proyecto
+
+php scripts/setup.php     # nombre, descripción e indicar si se conserva el módulo de ejemplo
+
 bun install --ignore-scripts
-cp .env.example .env      # indicar los valores de entorno a trabajar
+
+# rellena variables de entorno en .env
 
 composer run migrate      # crea las tablas de la BD
 composer run seed         # opcional: datos de ejemplo
@@ -39,8 +46,19 @@ composer run seed         # opcional: datos de ejemplo
 composer run dev
 ```
 
+`create-project` copia `.env.example` a `.env` automáticamente. El paso
+`php scripts/setup.php` es interactivo y hace tres cosas:
+
+1. Escribe el nombre y la descripción del paquete en `composer.json`.
+2. Pregunta si deseas conservar el módulo de ejemplo (`tasks`). Si respondes que no,
+   elimina sus archivos y deja rutas, contenedor, seeders y portada limpios.
+3. Se borra a sí mismo, junto con la carpeta `scripts/` y el hook de Composer.
+
+Hay que ejecutarlo a mano porque Composer no conecta la consola a los scripts
+que lanza, y sin ella no puede preguntar nada.
+
 `composer run dev` levanta **los dos servidores a la vez** (PHP y Vite) con
-salida etiquetada:
+salida etiquetada al estilo de frameworks como Laravel:
 
 ```
 [vite]   VITE v8.1.5  ready in 353 ms
@@ -57,6 +75,8 @@ de assets de Vite.
 
 ## Estructura
 
+Las rutas marcadas con **(demo)** desaparecen si descartas el módulo de ejemplo.
+
 ```
 public/index.php ............ Front controller: bootstrap, contenedor, app
 public/build/ ............... Assets compilados por Vite (generado)
@@ -66,6 +86,7 @@ public/.htaccess ............ Reescritura a index.php (Apache)
 bootstrap/app.php ........... Construye la app: contenedor, config, rutas
 server.php .................. Router del servidor embebido de PHP
 serve.mjs ................... Arranca el servidor PHP con salida formateada
+scripts/setup.php ........... Instalador interactivo (se autoelimina)
 
 config/
   settings.php .............. Configuración leída del .env
@@ -81,36 +102,48 @@ routes/
 
 database/
   migrations/ ............... Migraciones de Phinx
-  seeds/ .................... Seeders (DatabaseSeeder, TaskSeeder)
+  seeds/DatabaseSeeder.php .. Orquesta los seeders
+  seeds/TaskSeeder.php ...... (demo) Datos de ejemplo con Faker
 phinx.php ................... Config de Phinx: deriva el adaptador del DB_DSN
 
 src/Domain/ ................. Núcleo sin framework
-  Task/Task.php ............. Entidad
-  Task/TaskRepository.php ... Contrato de persistencia
   Shared/ ................... Excepciones (NotFound, Validation)
+  Task/Task.php ............. (demo) Entidad
+  Task/TaskRepository.php ... (demo) Contrato de persistencia
 
 src/Application/ ............ Casos de uso y borde HTTP
-  Http/Controller/ .......... Controladores (API y web)
-  Service/TaskService.php ... Lógica de negocio
-  DTO/TaskInput.php ......... Entrada + reglas de validación (#[Assert\*])
+  Http/Api.php .............. Acción base: serialización JSON
+  Http/Controller/WebController.php ....... Portada
+  Http/Controller/TaskController.php ...... (demo) API
+  Http/Controller/TaskWebController.php ... (demo) Web
+  Service/TaskService.php ... (demo) Lógica de negocio
+  DTO/TaskInput.php ......... (demo) Entrada + reglas (#[Assert\*])
+  Core/Settings/ ............ Acceso tipado a la configuración
   Core/Validation/ .......... Validator (interfaz) + adaptador de Symfony
   Core/Handler/ ............. Excepción → respuesta HTTP; página de debug
   Core/Middleware/ .......... JSON body, throttling, sondas de DevTools
-  Core/Throttle/ ............ Límite de peticiones por IP
+  Core/Throttle/ ............ Límite de peticiones por IP (store en fichero)
   Core/Asset/ ............... Lee el manifest de Vite para las plantillas
 
 src/Infrastructure/
-  Persistence/PdoTaskRepository.php ...... Implementación SQL
-  Persistence/InMemoryTaskRepository.php . Implementación para tests
+  Persistence/PdoTaskRepository.php ...... (demo) Implementación SQL
+  Persistence/InMemoryTaskRepository.php . (demo) Implementación para tests
 
 templates/
-  views/ .................... Plantillas Twig (SSR)
+  views/layouts/ ............ Layout base
+  views/errors/ ............. Plantilla de error
+  views/pages/home/ ......... Portada
+  views/pages/tasks/ ........ (demo) Lista y formulario
+  views/components/ ......... (demo) task-form.twig
   css/app.css ............... Tailwind + DaisyUI
   js/ ....................... Frontend por módulos (ver abajo)
 
 tests/
-  Unit/ ..................... Lógica de negocio aislada
-  Feature/ .................. Pila HTTP completa + reglas de arquitectura
+  Pest.php .................. Helpers: testApp(), apiRequest(), jsonBody()
+  TestCase.php .............. TestCase base
+  Unit/TaskServiceTest.php .. (demo) Lógica de negocio aislada
+  Feature/TaskApiTest.php ... (demo) Pila HTTP completa
+  Feature/ArchTest.php ...... Reglas de arquitectura
 ```
 
 ---
@@ -119,22 +152,22 @@ tests/
 
 **Web (HTML)**
 
-| Método | Ruta            | Descripción            |
-| ------ | --------------- | ---------------------- |
-| GET    | `/`             | Página de bienvenida   |
-| GET    | `/tasks`        | Lista de tareas        |
-| GET    | `/tasks/create` | Formulario de creación |
-| GET    | `/health`       | Healthcheck (204)      |
+| Método | Ruta            | Descripción                   |
+| ------ | --------------- | ----------------------------- |
+| GET    | `/`             | Página de bienvenida          |
+| GET    | `/health`       | Healthcheck (204)             |
+| GET    | `/tasks`        | (demo) Lista de tareas        |
+| GET    | `/tasks/create` | (demo) Formulario de creación |
 
-**API (JSON)**
+**API (JSON)** — solo con el módulo de ejemplo
 
-| Método | Ruta               | Descripción       |
-| ------ | ------------------ | ----------------- |
-| GET    | `/api/tasks`       | Listar            |
-| GET    | `/api/tasks/{id}`  | Ver una           |
-| POST   | `/api/tasks`       | Crear             |
-| PUT    | `/api/tasks/{id}`  | Actualizar        |
-| DELETE | `/api/tasks/{id}`  | Eliminar (204)    |
+| Método | Ruta              | Descripción    |
+| ------ | ----------------- | -------------- |
+| GET    | `/api/tasks`      | Listar         |
+| GET    | `/api/tasks/{id}` | Ver una        |
+| POST   | `/api/tasks`      | Crear          |
+| PUT    | `/api/tasks/{id}` | Actualizar     |
+| DELETE | `/api/tasks/{id}` | Eliminar (204) |
 
 Las rutas de la API con `{id}` solo aceptan valores numéricos (`[0-9]+`).
 
@@ -158,8 +191,9 @@ Los errores se devuelven siempre con la misma forma:
 2. Se carga el `.env`, se construye el contenedor y la app Slim.
 3. Pasa por el middleware: parseo de JSON, routing, Twig y throttling.
 4. El router elige el controlador (`routes/web.php` o `routes/api.php`).
-5. El controlador arma un `TaskInput`, lo valida y delega en `TaskService`.
-6. El servicio usa `TaskRepository`; `PdoTaskRepository` ejecuta el SQL.
+5. El controlador arma un DTO de entrada, lo valida y delega en el servicio.
+6. El servicio usa el contrato del repositorio; la implementación PDO ejecuta
+   el SQL.
 7. La respuesta sale como HTML (Twig) o JSON según la ruta.
 
 Si algo lanza una excepción, `HttpErrorHandler` la traduce a HTTP de forma
@@ -185,22 +219,24 @@ composer run seed               # ejecuta los seeders
 composer run seed:create        # crea un seeder nuevo
 ```
 
-La migración inicial crea la tabla `tasks` (`id`, `title`, `completed`, además
-de `created_at` y `updated_at`). `TaskSeeder` la puebla con datos de ejemplo
-generados con Faker.
+Con el módulo de ejemplo, la migración inicial crea la tabla `tasks` (`id`,
+`title`, `completed`, `created_at`, `updated_at`) y `TaskSeeder` la puebla con
+Faker. Si lo descartaste, no hay migraciones ni seeders que ejecutar hasta que
+crees los tuyos: `composer run migrate` y `composer run seed` no harán nada.
 
 ---
 
 ## Frontend
 
-Un módulo por recurso, con la misma estructura siempre:
+Un módulo por recurso, con la misma estructura siempre.
+Esta misma está inspirada en el curso [JavaScript Moderno: Guía para dominar el lenguaje](https://www.udemy.com/course/javascript-fernando-herrera/?utm_campaign=Search_DSA_Alpha_Prof_la.ES_cc.MX_Subs&utm_source=google&utm_medium=paid-search&portfolio=Mexico&utm_audience=mx&utm_tactic=nb&utm_term=_._ag_185300353676_._ad_773433175635_._kw_&utm_content=g&funnel=&test=&gad_source=1&gad_campaignid=23001129117&gbraid=0AAAAADROdO0WxZ45r1UOQVoVkV2xeopal&gclid=CjwKCAjwmozTBhAeEiwAkEGZzmGct-O4o9oL25MjG2nOCYNo4izPFvnnfqidiaP0GYwi0VQp3Pa2JhoC7LgQAvD_BwE&couponCode=PMNVD2525)
 
 ```
 templates/js/
   app.js ......................... Entrada común (carga el CSS)
   lib/http.js .................... Axios + interceptores (avisa de 400/500)
   lib/toast.js ................... Toasts (esquina inferior derecha)
-  tasks/
+  tasks/                           (demo) Módulo de referencia
     api/tasks.api.js ............. Llamadas a /api/tasks
     store/store.js ............... Estado del módulo
     use-cases/ ................... Acciones (toggle, delete, render…)
@@ -208,7 +244,7 @@ templates/js/
 ```
 
 **Convención:** cada archivo en `<módulo>/presentation/*.js` es una entrada de
-Vite y se detecta sola (no hay que tocar `vite.config.js`). Para usarla en su
+Vite y se detecta sola (no hay que tocar `vite.config.js`). Para usarla en la
 vista:
 
 ```twig
@@ -249,9 +285,9 @@ composer run test:coverage
 
 Pest, con tres frentes:
 
-- **`tests/Unit`** — lógica de negocio aislada (`TaskServiceTest`).
-- **`tests/Feature/TaskApiTest`** — ejercita la pila HTTP completa (router,
-  middleware, validación, manejador de errores) contra
+- **`tests/Unit`** — lógica de negocio aislada (`TaskServiceTest`, demo).
+- **`tests/Feature/TaskApiTest`** (demo) — ejercita la pila HTTP completa
+  (router, middleware, validación, manejador de errores) contra
   `InMemoryTaskRepository`, sin tocar la base de datos.
 - **`tests/Feature/ArchTest`** — reglas de arquitectura: el dominio no puede
   depender de Slim, PDO, `App\Infrastructure` ni `App\Application`, y no deben
@@ -280,8 +316,8 @@ los valores por defecto de `config/settings.php`.
 
 ## Cambiar de persistencia
 
-Basta una línea en `config/repositories.php` para usar la implementación en
-memoria (por ejemplo, en tests):
+Basta una línea en `config/repositories.php` para cambiar qué implementación
+resuelve el contenedor:
 
 ```php
 TaskRepository::class => autowire(InMemoryTaskRepository::class)
@@ -306,3 +342,25 @@ borra `public/hot`, limpia las cachés de PHP-DI y Twig, y ajusta permisos en
 Para Apache hay un `apache-vhost.conf.example`. En cualquier servidor, el
 `DocumentRoot` debe apuntar a `public/`, nunca a la raíz del proyecto, para que
 `vendor/`, `config/` y `.env` queden fuera del alcance público.
+
+---
+
+## Mantener el scaffold
+
+Los cambios en este repositorio no llegan a `create-project` hasta que se
+publica una versión nueva:
+
+```bash
+git add -A
+git commit -m "Mejoras en el scaffold"
+git push
+git tag v1.1.0
+git push origin v1.1.0
+```
+
+Packagist recoge el tag en segundos vía webhook. Para probar la rama sin
+taggear:
+
+```bash
+composer create-project yh9alek/slim-pb prueba dev-main
+```
