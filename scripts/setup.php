@@ -140,6 +140,26 @@ function removePath(string $path): void
     @rmdir($path);
 }
 
+/** Elimina el enlace a /tasks de la portada. */
+function removeDemoLink(string $root): void
+{
+    $path = $root . '/templates/views/pages/home/home.twig';
+
+    if (!is_file($path)) {
+        return;
+    }
+
+    $html = (string) file_get_contents($path);
+
+    // El botón "Ver tareas" completo, con su SVG.
+    $pattern = '#\s*<a href="/tasks".*?</a>#s';
+    $clean = preg_replace($pattern, '', $html, 1);
+
+    if ($clean !== null && $clean !== $html) {
+        file_put_contents($path, $clean);
+    }
+}
+
 /** Sustituye el contenido de un archivo solo si ya existe. */
 function replaceFile(string $path, string $contents): void
 {
@@ -264,6 +284,8 @@ function removeDemoModule(string $root): void
         }
 
         PHP);
+
+    removeDemoLink($root);
 }
 
 // ---------------------------------------------------------------------------
