@@ -1,8 +1,8 @@
 {
     "name": "yh9alek/slim-pb",
-    "description": "Backend PHP con Slim 4",
+    "description": "Backend PHP con Slim 4 + Vite",
     "type": "project",
-    "license": "proprietary",
+    "license": "MIT",
     "minimum-stability": "stable",
     "require": {
         "php": ">=8.4.1",
@@ -32,9 +32,7 @@
         }
     },
     "scripts": {
-        "post-create-project-cmd": [
-            "@php scripts/setup.php"
-        ],
+        "post-create-project-cmd": ["@php scripts/setup.php --auto"],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
             "bun run dev:all"
@@ -43,15 +41,12 @@
             "Composer\\Config::disableProcessTimeout",
             "node serve.mjs"
         ],
-
         "migrate": "phinx migrate",
         "migrate:rollback": "phinx rollback",
         "migrate:status": "phinx status",
         "migrate:create": "phinx create",
-
         "seed:create": "phinx seed:create",
         "seed": "phinx seed:run",
-
         "cs:fix": "php-cs-fixer fix",
         "phpstan": "phpstan analyse --memory-limit=2G",
         "test": "pest",
