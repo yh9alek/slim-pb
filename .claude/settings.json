@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "php -r '$d=json_decode(stream_get_contents(STDIN),true);$f=$d[\"tool_input\"][\"file_path\"]??($d[\"tool_response\"][\"filePath\"]??\"\");if($f&&substr($f,-4)===\".php\"&&is_file($f)){passthru(\"php vendor/bin/php-cs-fixer fix \".escapeshellarg($f).\" --quiet\");}' 2>/dev/null || true",
+            "statusMessage": "Formateando con php-cs-fixer..."
+          }
+        ]
+      }
+    ]
+  }
+}
